@@ -7,13 +7,11 @@ import (
 
 type Android struct{}
 
-var names = []string{
-	"android",
-	"Android",
-}
-
 func (it *Android) Names() []string {
-	return names
+	return []string{
+		"android",
+		"Android",
+	}
 }
 
 func (it *Android) Header(lang goloc.Lang) string {
