@@ -86,7 +86,9 @@ func keyLocalizations(
 		if i < len(row) {
 			val := strings.TrimSpace(row[i].(string))
 			if len(val) > 0 {
-				keyLoc[lang] = withReplacedFormats(platform, val, formats, tab, line)
+				valWithoutSpecChars := withReplacedSpecialChars(platform, val)
+				finalValue := withReplacedFormats(platform, valWithoutSpecChars, formats, tab, line)
+				keyLoc[lang] = finalValue
 			} else if errorIfMissing {
 				return nil, &localizationMissingError{tab: tab, line: line, key: key, lang: lang}
 			} else {
@@ -122,6 +124,18 @@ func withReplacedFormats(platform Platform, str string, formats Formats, tab str
 		index += 1
 		return str
 	})
+}
+
+func withReplacedSpecialChars(platform Platform, str string) string {
+	specChars := platform.ReplacementChars()
+
+	replacements := make([]string, 0, len(specChars))
+	for orig, repl := range specChars {
+		replacements = append(replacements, orig)
+		replacements = append(replacements, repl)
+	}
+
+	return strings.NewReplacer(replacements...).Replace(str)
 }
 
 type localizationMissingError struct {
