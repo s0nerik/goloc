@@ -83,7 +83,7 @@ func Run(
 		log.Fatalf(`Can't parse formats from the "%v" tab. Reason: %v.`, formatsTabName, err)
 	}
 
-	loc, err := ParseLocalizations(api, platform, sheetId, resDir, tabName, keyColumn, stopOnMissing)
+	loc, err := ParseLocalizations(api, platform, sheetId, tabName, keyColumn, stopOnMissing)
 	if err != nil {
 		log.Fatalf(`Can't parse localizations from the "%v" tab. Reason: %v.`, tabName, err)
 	}

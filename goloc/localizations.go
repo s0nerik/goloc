@@ -12,7 +12,6 @@ func ParseLocalizations(
 	api *sheets.SpreadsheetsService,
 	platform Platform,
 	sheetId string,
-	resDir string,
 	tabName string,
 	keyColumn string,
 	errorIfMissing bool,
@@ -77,8 +76,6 @@ func ParseLocalizations(
 		}
 		loc[key] = keyLoc
 	}
-
-	log.Println(fmt.Sprintf(`keyColIndex: %v, langColumns: %v`, keyColIndex, langColumns))
 
 	return loc, nil
 }
