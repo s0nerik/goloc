@@ -28,12 +28,20 @@ type Platform interface{
 	LocalizationFileName(lang Lang) string
 }
 
-func FormatRegexp() (*regexp.Regexp, error) {
+func FormatRegexp() *regexp.Regexp {
 	r, err := regexp.Compile(`\{([^\{^\}]*)\}`)
 	if err != nil {
-		log.Fatalf("Can't create a format regexp: %v", err)
+		log.Fatalf("Can't create a regexp for format string. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
 	}
-	return r, nil
+	return r
+}
+
+func LangColumnNameRegexp() *regexp.Regexp {
+	r, err := regexp.Compile("lang_([a-z]{2})")
+	if err != nil {
+		log.Fatalf("Can't create a regexp for lang column name. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
+	}
+	return r
 }
 
 func sheetsApi(credFilePath string) *sheets.SpreadsheetsService {
@@ -57,7 +65,17 @@ func sheetsApi(credFilePath string) *sheets.SpreadsheetsService {
 	return s.Spreadsheets
 }
 
-func Run(platform Platform, credFilePath string, sheetId string, tabName string, formatsTabName string, formatNameColumn string) {
+func Run(
+	platform Platform,
+	resDir string,
+	credFilePath string,
+	sheetId string,
+	tabName string,
+	keyColumn string,
+	formatsTabName string,
+	formatNameColumn string,
+	stopOnMissing bool,
+) {
 	api := sheetsApi(credFilePath)
 
 	formats, err := ParseFormats(api, platform, sheetId, formatsTabName, formatNameColumn)
@@ -65,5 +83,19 @@ func Run(platform Platform, credFilePath string, sheetId string, tabName string,
 		log.Fatalf(`Can't parse formats from the "%v" tab. Reason: %v.`, formatsTabName, err)
 	}
 
-	log.Println(formats)
+	loc, err := ParseLocalizations(api, platform, sheetId, resDir, tabName, keyColumn, stopOnMissing)
+	if err != nil {
+		log.Fatalf(`Can't parse localizations from the "%v" tab. Reason: %v.`, tabName, err)
+	}
+
+	for k, v := range formats {
+		log.Printf(`FORMAT %v: %v`, k, v)
+	}
+
+	for k, v := range loc {
+		log.Printf(`LOCALIZATION %v`, k)
+		for k, v := range v {
+			log.Printf(`LOCALIZATION %v: %v`, k, v)
+		}
+	}
 }

@@ -13,6 +13,8 @@ var (
 	sheetId          = kingpin.Flag(`spreadsheet`, `Spreadsheet ID.`).Short('s').Required().String()
 	resDir           = kingpin.Flag(`resources`, `Path to the resources folder in the project.`).Short('r').Required().String()
 	tabName          = kingpin.Flag(`tab`, `Localizations tab name.`).Short('t').Required().String()
+	keyColumn        = kingpin.Flag(`key-column`, `Title of the key column`).Default(`key`).String()
+	stopOnMissing    = kingpin.Flag(`stop-on-missing`, `Title of the key column`).Default(`false`).Bool()
 	formatsTabName   = kingpin.Flag(`formats-tab`, `Formats tab name`).Short('f').Default(`formats`).String()
 	formatNameColumn = kingpin.Flag(`format-name-column`, `Title of the format name column`).Default(`format`).String()
 	defLoc           = kingpin.Flag(`default-localization`, `Default localization language (e.g. "en").`).Default(`en`).String()
@@ -29,5 +31,5 @@ func main() {
 		log.Fatalf("Platform %v is not supported.", *platformName)
 	}
 
-	goloc.Run(platform, *credentials, *sheetId, *tabName, *formatsTabName, *formatNameColumn)
+	goloc.Run(platform, *resDir, *credentials, *sheetId, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *stopOnMissing)
 }
