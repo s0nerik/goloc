@@ -8,9 +8,12 @@ import (
 	"strings"
 )
 
+type langColumns = map[int]Lang
+
 func ParseLocalizations(
 	api *sheets.SpreadsheetsService,
 	platform Platform,
+	formats Formats,
 	sheetId string,
 	tabName string,
 	keyColumn string,
@@ -27,7 +30,7 @@ func ParseLocalizations(
 	}
 
 	var keyColIndex = -1
-	var langColumns = map[int]Lang{}
+	var langColumns = langColumns{}
 	for i, val := range firstRow {
 		if val == keyColumn {
 			keyColIndex = i
@@ -47,37 +50,78 @@ func ParseLocalizations(
 	}
 
 	loc := Localizations{}
-	for line, row := range resp.Values[1:] {
+	for index, row := range resp.Values[1:] {
+		actualRow := index+2
 		if keyColIndex >= len(row) || len(strings.TrimSpace(row[keyColIndex].(Key))) == 0 {
 			if errorIfMissing {
-				return nil, &keyMissingError{tab: tabName, line: line+2}
+				return nil, &keyMissingError{tab: tabName, line: actualRow}
 			} else {
-				log.Println(&keyMissingError{tab: tabName, line: line+2})
+				log.Println(&keyMissingError{tab: tabName, line: actualRow})
 				continue
 			}
 		}
 		key := strings.TrimSpace(row[keyColIndex].(Key))
-		keyLoc := map[Key]string{}
-		for i, lang := range langColumns {
-			if i < len(row) {
-				val := strings.TrimSpace(row[i].(string))
-				if len(val) != 0 {
-					keyLoc[lang] = val
-				} else if errorIfMissing {
-					return nil, &localizationMissingError{key: key, lang: lang}
-				} else {
-					log.Println(&localizationMissingError{key: key, lang: lang})
-				}
+		if keyLoc, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langColumns, errorIfMissing); err == nil {
+			loc[key] = keyLoc
+		} else {
+			return nil, err
+		}
+	}
+
+	return loc, nil
+}
+
+func keyLocalizations(
+	platform Platform,
+	formats Formats,
+	tab string,
+	line int,
+	row []interface{},
+	key Key,
+	langColumns langColumns,
+	errorIfMissing bool,
+) (map[Key]string, error) {
+	keyLoc := map[Key]string{}
+	for i, lang := range langColumns {
+		if i < len(row) {
+			val := strings.TrimSpace(row[i].(string))
+			if len(val) > 0 {
+				keyLoc[lang] = withReplacedFormats(platform, val, formats, tab, line)
 			} else if errorIfMissing {
 				return nil, &localizationMissingError{key: key, lang: lang}
 			} else {
 				log.Println(&localizationMissingError{key: key, lang: lang})
 			}
+		} else if errorIfMissing {
+			return nil, &localizationMissingError{key: key, lang: lang}
+		} else {
+			log.Println(&localizationMissingError{key: key, lang: lang})
 		}
-		loc[key] = keyLoc
 	}
+	return keyLoc, nil
+}
 
-	return loc, nil
+func withReplacedFormats(platform Platform, str string, formats Formats, tab string, line int) string {
+	var index uint = 0
+	return FormatRegexp().ReplaceAllStringFunc(str, func(formatName string) string {
+		if len(formatName) < 2 {
+			log.Fatalf(`%v!%v: something went wrong. Please submit an issue with the values in the problematic row.`, tab, line)
+		}
+
+		name := formatName[1:len(formatName) - 1]
+		if format, ok := formats[name]; ok {
+			str, err := platform.IndexedFormatString(index, format)
+			if err != nil {
+				log.Fatalf(`%v!%v: can't use the "%v" format. Reason: %v`, tab, line, name, err)
+			}
+			return str
+		} else {
+			log.Fatalf(`%v!%v: no such format - "%v".`, tab, line, name)
+		}
+
+		index += 1
+		return str
+	})
 }
 
 type localizationMissingError struct {

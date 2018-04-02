@@ -4,6 +4,7 @@ import (
 	"google.golang.org/api/sheets/v4"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 func ParseFormats(
@@ -25,6 +26,7 @@ func ParseFormats(
 
 	var formatColIndex = -1
 	var platformColIndex = -1
+	var actualPlatformName = ``
 	for i, val := range firstRow {
 		if val == formatNameColumn {
 			formatColIndex = i
@@ -32,6 +34,7 @@ func ParseFormats(
 		for _, name := range platform.Names() {
 			if val == name {
 				platformColIndex = i
+				actualPlatformName = name
 			}
 		}
 	}
@@ -45,9 +48,47 @@ func ParseFormats(
 	}
 
 	formats := Formats{}
-	for _, row := range resp.Values[1:] {
-		formats[row[formatColIndex].(FormatKey)] = row[platformColIndex].(string)
+	for rowIndex, row := range resp.Values[1:] {
+		actualRowIndex := uint(rowIndex + 2)
+		if formatColIndex >= len(row) {
+			return nil, &formatNameNotSpecifiedError{tab: formatsTabName, row: actualRowIndex}
+		}
+		if platformColIndex >= len(row) {
+			return nil, &formatValueNotSpecifiedError{tab: formatsTabName, row: actualRowIndex, platformName: actualPlatformName}
+		}
+		if key, ok := row[formatColIndex].(FormatKey); ok {
+			if val, ok := row[platformColIndex].(string); ok {
+				trimmedVal := strings.TrimSpace(val)
+				if len(trimmedVal) == 0 {
+					return nil, &formatValueNotSpecifiedError{tab: formatsTabName, row: actualRowIndex, platformName: actualPlatformName}
+				}
+				formats[key] = trimmedVal
+			} else {
+				return nil, errors.New(fmt.Sprintf(`%v!%v: wrong value type`, formatsTabName, actualRowIndex))
+			}
+		} else {
+			return nil, errors.New(fmt.Sprintf(`%v!%v: wrong key type`, formatsTabName, actualRowIndex))
+		}
 	}
 
 	return formats, nil
+}
+
+type formatNameNotSpecifiedError struct {
+	tab string
+	row uint
+}
+
+func (e *formatNameNotSpecifiedError) Error() string {
+	return fmt.Sprintf(`%v!%v: format name is not specified`, e.tab, e.row)
+}
+
+type formatValueNotSpecifiedError struct {
+	tab          string
+	row          uint
+	platformName string
+}
+
+func (e *formatValueNotSpecifiedError) Error() string {
+	return fmt.Sprintf(`%v!%v: value for "%v" platform is not specified`, e.tab, e.row, e.platformName)
 }

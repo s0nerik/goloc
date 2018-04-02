@@ -3,6 +3,8 @@ package platforms
 import (
 	"github.com/s0nerik/goloc/goloc"
 	"fmt"
+	"strings"
+	"errors"
 )
 
 type Android struct{}
@@ -22,8 +24,11 @@ func (it *Android) Footer(lang goloc.Lang) string {
 	return "</resources>\n"
 }
 
-func (it *Android) IndexedFormatString(index int, format string) string {
-	return "%"+string(index)+"$"+format
+func (it *Android) IndexedFormatString(index uint, format string) (string, error) {
+	if strings.HasPrefix(format, `%`) {
+		return ``, errors.New(`format string shouldn't start with "%" sign`)
+	}
+	return fmt.Sprintf(`%%%v$%v`, index+1, format), nil
 }
 
 func (it *Android) LocalizationFileName(lang goloc.Lang) string {

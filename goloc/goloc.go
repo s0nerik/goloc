@@ -7,6 +7,7 @@ import (
 	"google.golang.org/api/sheets/v4"
 	"golang.org/x/net/context"
 	"regexp"
+	"sync"
 )
 
 type Lang = string
@@ -23,25 +24,37 @@ type Platform interface{
 	ReplacementChars() map[string]string
 	Header(lang Lang) string
 	Footer(lang Lang) string
-	IndexedFormatString(index int, format string) string
+	IndexedFormatString(index uint, format string) (string, error)
 	LangResPath(lang Lang, resDir ResDir) string
 	LocalizationFileName(lang Lang) string
 }
 
+var formatRegexpInitializer sync.Once
+var formatRegexp *regexp.Regexp
+
+var langColumnRegexpInitializer sync.Once
+var langColumnRegexp *regexp.Regexp
+
 func FormatRegexp() *regexp.Regexp {
-	r, err := regexp.Compile(`\{([^\{^\}]*)\}`)
-	if err != nil {
-		log.Fatalf("Can't create a regexp for format string. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
-	}
-	return r
+	formatRegexpInitializer.Do(func() {
+		r, err := regexp.Compile(`\{([^\{^\}]*)\}`)
+		if err != nil {
+			log.Fatalf("Can't create a regexp for format string. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
+		}
+		formatRegexp = r
+	})
+	return formatRegexp
 }
 
 func LangColumnNameRegexp() *regexp.Regexp {
-	r, err := regexp.Compile("lang_([a-z]{2})")
-	if err != nil {
-		log.Fatalf("Can't create a regexp for lang column name. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
-	}
-	return r
+	langColumnRegexpInitializer.Do(func() {
+		r, err := regexp.Compile("lang_([a-z]{2})")
+		if err != nil {
+			log.Fatalf("Can't create a regexp for lang column name. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
+		}
+		langColumnRegexp = r
+	})
+	return langColumnRegexp
 }
 
 func sheetsApi(credFilePath string) *sheets.SpreadsheetsService {
@@ -83,7 +96,7 @@ func Run(
 		log.Fatalf(`Can't parse formats from the "%v" tab. Reason: %v.`, formatsTabName, err)
 	}
 
-	loc, err := ParseLocalizations(api, platform, sheetId, tabName, keyColumn, stopOnMissing)
+	loc, err := ParseLocalizations(api, platform, formats, sheetId, tabName, keyColumn, stopOnMissing)
 	if err != nil {
 		log.Fatalf(`Can't parse localizations from the "%v" tab. Reason: %v.`, tabName, err)
 	}
