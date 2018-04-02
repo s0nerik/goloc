@@ -51,7 +51,7 @@ func ParseLocalizations(
 
 	loc := Localizations{}
 	for index, row := range resp.Values[1:] {
-		actualRow := index+2
+		actualRow := index + 2
 		if keyColIndex >= len(row) || len(strings.TrimSpace(row[keyColIndex].(Key))) == 0 {
 			if errorIfMissing {
 				return nil, &keyMissingError{tab: tabName, line: actualRow}
@@ -88,14 +88,14 @@ func keyLocalizations(
 			if len(val) > 0 {
 				keyLoc[lang] = withReplacedFormats(platform, val, formats, tab, line)
 			} else if errorIfMissing {
-				return nil, &localizationMissingError{key: key, lang: lang}
+				return nil, &localizationMissingError{tab: tab, line: line, key: key, lang: lang}
 			} else {
-				log.Println(&localizationMissingError{key: key, lang: lang})
+				log.Println(&localizationMissingError{tab: tab, line: line, key: key, lang: lang})
 			}
 		} else if errorIfMissing {
-			return nil, &localizationMissingError{key: key, lang: lang}
+			return nil, &localizationMissingError{tab: tab, line: line, key: key, lang: lang}
 		} else {
-			log.Println(&localizationMissingError{key: key, lang: lang})
+			log.Println(&localizationMissingError{tab: tab, line: line, key: key, lang: lang})
 		}
 	}
 	return keyLoc, nil
@@ -108,7 +108,7 @@ func withReplacedFormats(platform Platform, str string, formats Formats, tab str
 			log.Fatalf(`%v!%v: something went wrong. Please submit an issue with the values in the problematic row.`, tab, line)
 		}
 
-		name := formatName[1:len(formatName) - 1]
+		name := formatName[1 : len(formatName)-1]
 		if format, ok := formats[name]; ok {
 			str, err := platform.IndexedFormatString(index, format)
 			if err != nil {
@@ -125,19 +125,21 @@ func withReplacedFormats(platform Platform, str string, formats Formats, tab str
 }
 
 type localizationMissingError struct {
+	tab  string
+	line int
 	key  string
 	lang string
 }
 
 func (e *localizationMissingError) Error() string {
-	return fmt.Sprintf(`"%v" is missing for "%v" language`, e.key, e.lang)
+	return fmt.Sprintf(`%v!%v: "%v" is missing for "%v" language`, e.tab, e.line, e.key, e.lang)
 }
 
 type keyMissingError struct {
+	tab  string
 	line int
-	tab string
 }
 
 func (e *keyMissingError) Error() string {
-	return fmt.Sprintf(`key name is missing for line %v in "%v" tab`, e.line, e.tab)
+	return fmt.Sprintf(`%v!%v: key name is missing`, e.tab, e.line)
 }
