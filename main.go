@@ -17,9 +17,8 @@ var (
 	stopOnMissing    = kingpin.Flag(`stop-on-missing`, `Title of the key column`).Default(`false`).Bool()
 	formatsTabName   = kingpin.Flag(`formats-tab`, `Formats tab name`).Short('f').Default(`formats`).String()
 	formatNameColumn = kingpin.Flag(`format-name-column`, `Title of the format name column`).Default(`format`).String()
-	defLoc           = kingpin.Flag(`default-localization`, `Default localization language (e.g. "en").`).Default(`en`).String()
-	defLocPath       = kingpin.Flag(`default-localization-path`, `Full path to default localization file.`).String()
-	preferDefLoc     = kingpin.Flag(`prefer-default-localization`, `Don't provide language-specific resources for default language.`).Default(`true`).Bool()
+	defLoc           = kingpin.Flag(`default-localization`, `Default localization language (e.g. "en"). Specifying this doesn't have any effect if the "--default-localization-file-path" is not specified.`).Default(`en`).String()
+	defLocPath       = kingpin.Flag(`default-localization-file-path`, `Full path to default localization file. Specify this if you want to write a default localization into a specific file (ignoring the localization path generation logic for a language specified in "--default-localization").`).String()
 )
 
 func main() {
@@ -31,5 +30,5 @@ func main() {
 		log.Fatalf("Platform %v is not supported.", *platformName)
 	}
 
-	goloc.Run(platform, *resDir, *credentials, *sheetId, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *stopOnMissing)
+	goloc.Run(platform, *resDir, *credentials, *sheetId, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing)
 }

@@ -155,5 +155,5 @@ type keyMissingError struct {
 }
 
 func (e *keyMissingError) Error() string {
-	return fmt.Sprintf(`%v!%v: key name is missing`, e.tab, e.line)
+	return fmt.Sprintf(`%v!%v: key name is missing, ignoring this string...`, e.tab, e.line)
 }

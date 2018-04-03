@@ -19,16 +19,6 @@ type Formats = map[FormatKey]string
 
 type ResDir = string
 
-type Platform interface{
-	Names() []string
-	ReplacementChars() map[string]string
-	Header(lang Lang) string
-	Footer(lang Lang) string
-	IndexedFormatString(index uint, format string) (string, error)
-	LangResPath(lang Lang, resDir ResDir) string
-	LocalizationFileName(lang Lang) string
-}
-
 var formatRegexpInitializer sync.Once
 var formatRegexp *regexp.Regexp
 
@@ -87,6 +77,8 @@ func Run(
 	keyColumn string,
 	formatsTabName string,
 	formatNameColumn string,
+	defaultLocalization string,
+	defaultLocalizationPath string,
 	stopOnMissing bool,
 ) {
 	api := sheetsApi(credFilePath)
@@ -96,19 +88,13 @@ func Run(
 		log.Fatalf(`Can't parse formats from the "%v" tab. Reason: %v.`, formatsTabName, err)
 	}
 
-	loc, err := ParseLocalizations(api, platform, formats, sheetId, tabName, keyColumn, stopOnMissing)
+	localizations, err := ParseLocalizations(api, platform, formats, sheetId, tabName, keyColumn, stopOnMissing)
 	if err != nil {
 		log.Fatalf(`Can't parse localizations from the "%v" tab. Reason: %v.`, tabName, err)
 	}
 
-	for k, v := range formats {
-		log.Printf(`FORMAT %v: %v`, k, v)
-	}
-
-	for k, v := range loc {
-		log.Printf(`LOCALIZATION %v`, k)
-		for k, v := range v {
-			log.Printf(`LOCALIZATION %v: %v`, k, v)
-		}
+	err = WriteLocalizations(platform, resDir, localizations, defaultLocalization, defaultLocalizationPath)
+	if err != nil {
+		log.Fatalf(`Can't write localizations. Reason: %v.`, err)
 	}
 }

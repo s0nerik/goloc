@@ -5,9 +5,14 @@ import (
 	"fmt"
 	"strings"
 	"errors"
+	"path/filepath"
 )
 
-type Android struct{}
+type Android struct {}
+
+func (it *Android) String() string {
+	return "android"
+}
 
 func (it *Android) Names() []string {
 	return []string{
@@ -18,6 +23,10 @@ func (it *Android) Names() []string {
 
 func (it *Android) Header(lang goloc.Lang) string {
 	return "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<resources>\n"
+}
+
+func (it *Android) Localization(lang goloc.Lang, key goloc.Key, value string) string {
+	return fmt.Sprintf("\t<string name=\"%v\">%v</string>\n", key, value)
 }
 
 func (it *Android) Footer(lang goloc.Lang) string {
@@ -35,11 +44,12 @@ func (it *Android) LocalizationFileName(lang goloc.Lang) string {
 	return "localized_strings.xml"
 }
 
-func (it *Android) LangResPath(lang goloc.Lang, resDir goloc.ResDir) string {
+func (it *Android) LocalizationDirPath(lang goloc.Lang, resDir goloc.ResDir) string {
+	targetDir := fmt.Sprintf("values-%v", lang)
 	if resDir != "" {
-		return fmt.Sprintf("%v/values-%v", resDir, lang)
+		return filepath.Join(resDir, targetDir)
 	} else {
-		return fmt.Sprintf("src/main/res/values-%v", lang)
+		return filepath.Join("src", "main", "res", targetDir)
 	}
 }
 
@@ -56,4 +66,3 @@ func (it *Android) ReplacementChars() map[string]string {
 		`&`:  `&amp;`,
 	}
 }
-
