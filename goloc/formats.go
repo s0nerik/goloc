@@ -1,25 +1,18 @@
 package goloc
 
 import (
-	"google.golang.org/api/sheets/v4"
 	"errors"
 	"fmt"
 	"strings"
 )
 
 func ParseFormats(
-	api *sheets.SpreadsheetsService,
+	rawData [][]interface{},
 	platform Platform,
-	sheetId string,
 	formatsTabName string,
 	formatNameColumn string,
 ) (Formats, error) {
-	resp, err := api.Values.Get(sheetId, formatsTabName).Do()
-	if err != nil {
-		return nil, err
-	}
-
-	firstRow := resp.Values[0]
+	firstRow := rawData[0]
 	if firstRow == nil {
 		return nil, errors.New(fmt.Sprintf(`there's no first row in the "%v" tab`, formatsTabName))
 	}
@@ -48,7 +41,7 @@ func ParseFormats(
 	}
 
 	formats := Formats{}
-	for rowIndex, row := range resp.Values[1:] {
+	for rowIndex, row := range rawData[1:] {
 		actualRowIndex := uint(rowIndex + 2)
 		if formatColIndex >= len(row) {
 			return nil, &formatNameNotSpecifiedError{tab: formatsTabName, row: actualRowIndex}

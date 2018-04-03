@@ -1,7 +1,6 @@
 package goloc
 
 import (
-	"google.golang.org/api/sheets/v4"
 	"log"
 	"errors"
 	"fmt"
@@ -11,20 +10,14 @@ import (
 type langColumns = map[int]Lang
 
 func ParseLocalizations(
-	api *sheets.SpreadsheetsService,
+	rawData [][]interface{},
 	platform Platform,
 	formats Formats,
-	sheetId string,
 	tabName string,
 	keyColumn string,
 	errorIfMissing bool,
 ) (Localizations, error) {
-	resp, err := api.Values.Get(sheetId, tabName).Do()
-	if err != nil {
-		return nil, err
-	}
-
-	firstRow := resp.Values[0]
+	firstRow := rawData[0]
 	if firstRow == nil {
 		return nil, errors.New(fmt.Sprintf(`there's no first row in the "%v" tab`, tabName))
 	}
@@ -50,7 +43,7 @@ func ParseLocalizations(
 	}
 
 	loc := Localizations{}
-	for index, row := range resp.Values[1:] {
+	for index, row := range rawData[1:] {
 		actualRow := index + 2
 		if keyColIndex >= len(row) || len(strings.TrimSpace(row[keyColIndex].(Key))) == 0 {
 			if errorIfMissing {

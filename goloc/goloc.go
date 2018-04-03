@@ -68,6 +68,46 @@ func sheetsApi(credFilePath string) *sheets.SpreadsheetsService {
 	return s.Spreadsheets
 }
 
+func fetchRawValues(api *sheets.SpreadsheetsService, sheetId string, tab string) ([][]interface{}, error) {
+	resp, err := api.Values.Get(sheetId, tab).Do()
+	if err != nil {
+		return nil, err
+	}
+	return resp.Values, nil
+}
+
+func fetchEverythingRaw(
+	api *sheets.SpreadsheetsService,
+	sheetId string,
+	formatsTab string,
+	localizationsTab string,
+) (rawFormats, rawLocalizations [][]interface{}, err error) {
+	var formatsError error
+	var localizationsError error
+
+	var wg sync.WaitGroup
+	go func() {
+		defer wg.Done()
+		rawFormats, formatsError = fetchRawValues(api, sheetId, formatsTab)
+	}()
+	go func() {
+		defer wg.Done()
+		rawLocalizations, localizationsError = fetchRawValues(api, sheetId, localizationsTab)
+	}()
+
+	wg.Add(2)
+	wg.Wait()
+
+	if formatsError != nil {
+		return nil, nil, formatsError
+	}
+	if localizationsError != nil {
+		return nil, nil, localizationsError
+	}
+
+	return
+}
+
 func Run(
 	platform Platform,
 	resDir string,
@@ -83,12 +123,17 @@ func Run(
 ) {
 	api := sheetsApi(credFilePath)
 
-	formats, err := ParseFormats(api, platform, sheetId, formatsTabName, formatNameColumn)
+	rawFormats, rawLocalizations, err := fetchEverythingRaw(api, sheetId, formatsTabName, tabName)
+	if err != nil {
+		log.Fatalf(`Can't fetch data from "%v" sheet. Reason: %v.`, sheetId, err)
+	}
+
+	formats, err := ParseFormats(rawFormats, platform, formatsTabName, formatNameColumn)
 	if err != nil {
 		log.Fatalf(`Can't parse formats from the "%v" tab. Reason: %v.`, formatsTabName, err)
 	}
 
-	localizations, err := ParseLocalizations(api, platform, formats, sheetId, tabName, keyColumn, stopOnMissing)
+	localizations, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing)
 	if err != nil {
 		log.Fatalf(`Can't parse localizations from the "%v" tab. Reason: %v.`, tabName, err)
 	}
