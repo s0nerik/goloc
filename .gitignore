@@ -17,3 +17,5 @@
 .DS_Store
 
 client_secret.json
+bin
+/test
