@@ -44,12 +44,12 @@ func ParseFormats(
 		actualRowIndex := uint(rowIndex + 2)
 		if formatColIndex >= len(row) {
 			return nil, &formatKeyNotSpecifiedError{
-				cell: cell{tab: formatsTabName, row: actualRowIndex, column: uint(formatColIndex)},
+				cell: *NewCell(formatsTabName, actualRowIndex, uint(formatColIndex)),
 			}
 		}
 		if platformColIndex >= len(row) {
 			return nil, &formatValueNotSpecifiedError{
-				cell:         cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
+				cell:         *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
 				platformName: actualPlatformName,
 			}
 		}
@@ -58,14 +58,14 @@ func ParseFormats(
 				trimmedVal := strings.TrimSpace(val)
 				if len(trimmedVal) == 0 {
 					return nil, &formatValueNotSpecifiedError{
-						cell:         cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
+						cell:         *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
 						platformName: actualPlatformName,
 					}
 				}
 				err := platform.ValidateFormat(trimmedVal)
 				if err != nil {
 					return nil, &formatValueInvalidError{
-						cell:         cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
+						cell:         *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
 						platformName: actualPlatformName,
 						formatValue:  trimmedVal,
 						reason:       err,
@@ -74,12 +74,12 @@ func ParseFormats(
 				formats[key] = trimmedVal
 			} else {
 				return nil, &wrongValueTypeError{
-					cell: cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
+					cell: *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
 				}
 			}
 		} else {
 			return nil, &wrongKeyTypeError{
-				cell: cell{tab: formatsTabName, row: actualRowIndex, column: uint(formatColIndex)},
+				cell: *NewCell(formatsTabName, actualRowIndex, uint(formatColIndex)),
 			}
 		}
 	}
@@ -102,27 +102,27 @@ type noPlatformColumnError struct {
 }
 
 type formatKeyNotSpecifiedError struct {
-	cell cell
+	cell Cell
 }
 
 type formatValueNotSpecifiedError struct {
 	platformName string
-	cell         cell
+	cell         Cell
 }
 
 type formatValueInvalidError struct {
-	cell         cell
+	cell         Cell
 	platformName string
 	formatValue  string
 	reason       error
 }
 
 type wrongValueTypeError struct {
-	cell cell
+	cell Cell
 }
 
 type wrongKeyTypeError struct {
-	cell cell
+	cell Cell
 }
 
 func (e *noFirstRowError) Error() string {
