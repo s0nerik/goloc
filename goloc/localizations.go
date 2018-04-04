@@ -134,6 +134,8 @@ func withReplacedSpecialChars(platform Platform, str string) string {
 	return strings.NewReplacer(replacements...).Replace(str)
 }
 
+// region Errors
+
 type firstRowNotFoundError struct {
 	cell Cell
 }
@@ -200,3 +202,5 @@ type formatNotFoundError struct {
 func (e *formatNotFoundError) Error() string {
 	return fmt.Sprintf(`%v: no such format - "%v"`, e.cell, e.formatName)
 }
+
+// endregion

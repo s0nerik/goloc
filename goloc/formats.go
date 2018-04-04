@@ -87,6 +87,8 @@ func ParseFormats(
 	return formats, nil
 }
 
+// region Errors
+
 type noFirstRowError struct {
 	tab string
 }
@@ -156,3 +158,5 @@ func (e *wrongValueTypeError) Error() string {
 func (e *wrongKeyTypeError) Error() string {
 	return fmt.Sprintf(`%v: wrong key type`, e.cell)
 }
+
+// endregion

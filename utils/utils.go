@@ -5,10 +5,12 @@ func ColumnName(i uint) string {
 }
 
 func columnName(orig string, i uint) string {
-	if i < 26 {
-		asciiIndex := 65 + i
+	const LettersNum = 26
+	const AsciiFirstLetterIndex = 65
+	if i < LettersNum {
+		asciiIndex := AsciiFirstLetterIndex + i
 		return orig + string(asciiIndex)
 	} else {
-		return columnName(columnName(orig, i/26-1), i%26)
+		return columnName(columnName(orig, i/LettersNum-1), i%LettersNum)
 	}
 }
