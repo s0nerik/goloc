@@ -130,7 +130,7 @@ func Run(
 
 	formats, err := ParseFormats(rawFormats, platform, formatsTabName, formatNameColumn)
 	if err != nil {
-		log.Fatalf(`Can't parse formats from the "%v" tab. Reason: %v.`, formatsTabName, err)
+		log.Fatal(err)
 	}
 
 	localizations, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing)

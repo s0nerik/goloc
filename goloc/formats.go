@@ -3,7 +3,6 @@ package goloc
 import (
 	"fmt"
 	"strings"
-	"github.com/s0nerik/goloc/utils"
 )
 
 func ParseFormats(
@@ -50,7 +49,7 @@ func ParseFormats(
 		}
 		if platformColIndex >= len(row) {
 			return nil, &formatValueNotSpecifiedError{
-				cell: cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
+				cell:         cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
 				platformName: actualPlatformName,
 			}
 		}
@@ -61,6 +60,15 @@ func ParseFormats(
 					return nil, &formatValueNotSpecifiedError{
 						cell:         cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
 						platformName: actualPlatformName,
+					}
+				}
+				err := platform.ValidateFormat(trimmedVal)
+				if err != nil {
+					return nil, &formatValueInvalidError{
+						cell:         cell{tab: formatsTabName, row: actualRowIndex, column: uint(platformColIndex)},
+						platformName: actualPlatformName,
+						formatValue:  trimmedVal,
+						reason:       err,
 					}
 				}
 				formats[key] = trimmedVal
@@ -93,12 +101,6 @@ type noPlatformColumnError struct {
 	platformNames []string
 }
 
-type cell struct {
-	tab    string
-	row    uint
-	column uint
-}
-
 type formatKeyNotSpecifiedError struct {
 	cell cell
 }
@@ -108,16 +110,19 @@ type formatValueNotSpecifiedError struct {
 	cell         cell
 }
 
+type formatValueInvalidError struct {
+	cell         cell
+	platformName string
+	formatValue  string
+	reason       error
+}
+
 type wrongValueTypeError struct {
 	cell cell
 }
 
 type wrongKeyTypeError struct {
 	cell cell
-}
-
-func (c cell) String() string {
-	return fmt.Sprintf(`%v!%v%v`, c.tab, utils.ColumnName(c.column), c.row)
 }
 
 func (e *noFirstRowError) Error() string {
@@ -138,6 +143,10 @@ func (e *formatKeyNotSpecifiedError) Error() string {
 
 func (e *formatValueNotSpecifiedError) Error() string {
 	return fmt.Sprintf(`%v: value for "%v" platform is not specified`, e.cell, e.platformName)
+}
+
+func (e *formatValueInvalidError) Error() string {
+	return fmt.Sprintf(`%v: format "%v" is invalid for platform "%v" (%v)`, e.cell, e.formatValue, e.platformName, e.reason)
 }
 
 func (e *wrongValueTypeError) Error() string {

@@ -33,10 +33,14 @@ func (it *Android) Footer(lang goloc.Lang) string {
 	return "</resources>\n"
 }
 
-func (it *Android) IndexedFormatString(index uint, format string) (string, error) {
+func (it *Android) ValidateFormat(format string) error {
 	if strings.HasPrefix(format, `%`) {
-		return ``, errors.New(`format string shouldn't start with "%" sign`)
+		return errors.New(`format must not start with "%" - it will be added automatically`)
 	}
+	return nil
+}
+
+func (it *Android) IndexedFormatString(index uint, format string) (string, error) {
 	return fmt.Sprintf(`%%%v$%v`, index+1, format), nil
 }
 
