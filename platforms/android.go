@@ -6,49 +6,54 @@ import (
 	"strings"
 	"errors"
 	"path/filepath"
+	"github.com/s0nerik/goloc/platforms/registry"
 )
 
-type Android struct {}
+func init() {
+	registry.Register(&android{})
+}
 
-func (it *Android) String() string {
+type android struct{}
+
+func (it *android) String() string {
 	return "android"
 }
 
-func (it *Android) Names() []string {
+func (it *android) Names() []string {
 	return []string{
 		"android",
 		"Android",
 	}
 }
 
-func (it *Android) Header(lang goloc.Lang) string {
+func (it *android) Header(lang goloc.Lang) string {
 	return "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<resources>\n"
 }
 
-func (it *Android) Localization(lang goloc.Lang, key goloc.Key, value string) string {
+func (it *android) Localization(lang goloc.Lang, key goloc.Key, value string) string {
 	return fmt.Sprintf("\t<string name=\"%v\">%v</string>\n", key, value)
 }
 
-func (it *Android) Footer(lang goloc.Lang) string {
+func (it *android) Footer(lang goloc.Lang) string {
 	return "</resources>\n"
 }
 
-func (it *Android) ValidateFormat(format string) error {
+func (it *android) ValidateFormat(format string) error {
 	if strings.HasPrefix(format, `%`) {
 		return errors.New(`format must not start with "%" - it will be added automatically`)
 	}
 	return nil
 }
 
-func (it *Android) IndexedFormatString(index uint, format string) string {
+func (it *android) IndexedFormatString(index uint, format string) string {
 	return fmt.Sprintf(`%%%v$%v`, index+1, format)
 }
 
-func (it *Android) LocalizationFileName(lang goloc.Lang) string {
+func (it *android) LocalizationFileName(lang goloc.Lang) string {
 	return "localized_strings.xml"
 }
 
-func (it *Android) LocalizationDirPath(lang goloc.Lang, resDir goloc.ResDir) string {
+func (it *android) LocalizationDirPath(lang goloc.Lang, resDir goloc.ResDir) string {
 	targetDir := fmt.Sprintf("values-%v", lang)
 	if resDir != "" {
 		return filepath.Join(resDir, targetDir)
@@ -57,7 +62,7 @@ func (it *Android) LocalizationDirPath(lang goloc.Lang, resDir goloc.ResDir) str
 	}
 }
 
-func (it *Android) ReplacementChars() map[string]string {
+func (it *android) ReplacementChars() map[string]string {
 	return map[string]string{
 		`\`:  `\\`,
 		`'`:  `\'`,

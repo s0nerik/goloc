@@ -27,7 +27,7 @@ func main() {
 
 	platform, err := resolver.FindPlatform(*platformName)
 	if err != nil {
-		log.Fatalf("Platform %v is not supported.", *platformName)
+		log.Fatalf(`Platform "%v" is not supported.`, *platformName)
 	}
 
 	goloc.Run(platform, *resDir, *credentials, *sheetId, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing)
