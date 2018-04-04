@@ -16,7 +16,7 @@ type Platform interface {
 	// Returns footer text. Can be an empty string. Newlines must be included here if localization format requires them.
 	Footer(lang Lang) string
 
-	// TODO: add IsStringValid method
+	// TODO: add IsFormatValid method
 
 	// Returns an actual format string taking the argument position into consideration.
 	// Example 1: format strings on Android are positional (with position starting from 1). In this case invocation of IndexedFormatString(0, "s") would return "%1$s".
