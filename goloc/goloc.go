@@ -135,7 +135,7 @@ func Run(
 
 	localizations, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing)
 	if err != nil {
-		log.Fatalf(`Can't parse localizations from the "%v" tab. Reason: %v.`, tabName, err)
+		log.Fatal(err)
 	}
 
 	err = WriteLocalizations(platform, resDir, localizations, defaultLocalization, defaultLocalizationPath)

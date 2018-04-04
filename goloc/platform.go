@@ -27,7 +27,7 @@ type Platform interface {
 	// Returns an actual format string taking the argument position into consideration.
 	// Example 1: format strings on Android are positional (with position starting from 1). In this case invocation of IndexedFormatString(0, "s") would return "%1$s".
 	// Example 2: format strings on iOS aren't positional. In this case invocation of IndexedFormatString(0, "@") would return "%@".
-	IndexedFormatString(index uint, format string) (string, error)
+	IndexedFormatString(index uint, format string) string
 
 	// Returns a directory for localization file for a given language.
 	LocalizationDirPath(lang Lang, resDir ResDir) string

@@ -40,8 +40,8 @@ func (it *Android) ValidateFormat(format string) error {
 	return nil
 }
 
-func (it *Android) IndexedFormatString(index uint, format string) (string, error) {
-	return fmt.Sprintf(`%%%v$%v`, index+1, format), nil
+func (it *Android) IndexedFormatString(index uint, format string) string {
+	return fmt.Sprintf(`%%%v$%v`, index+1, format)
 }
 
 func (it *Android) LocalizationFileName(lang goloc.Lang) string {

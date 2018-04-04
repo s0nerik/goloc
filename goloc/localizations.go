@@ -2,7 +2,6 @@ package goloc
 
 import (
 	"log"
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -19,7 +18,7 @@ func ParseLocalizations(
 ) (Localizations, error) {
 	firstRow := rawData[0]
 	if firstRow == nil {
-		return nil, errors.New(fmt.Sprintf(`there's no first row in the "%v" tab`, tabName))
+		return nil, &firstRowNotFoundError{Cell{tabName, uint(1), uint(0)}}
 	}
 
 	var keyColIndex = -1
@@ -35,11 +34,11 @@ func ParseLocalizations(
 	}
 
 	if keyColIndex == -1 {
-		return nil, errors.New(fmt.Sprintf(`"%v" column not found in the first row of "%v" tab`, keyColumn, tabName))
+		return nil, &columnNotFoundError{Cell{tabName, uint(1), uint(keyColIndex)}, keyColumn}
 	}
 
 	if len(langColumns) == 0 {
-		return nil, errors.New(fmt.Sprintf(`language columns are not found in the "%v" tab`, tabName))
+		return nil, &langColumnsNotFoundError{Cell{tabName, uint(1), uint(0)}}
 	}
 
 	loc := Localizations{}
@@ -47,9 +46,9 @@ func ParseLocalizations(
 		actualRow := index + 2
 		if keyColIndex >= len(row) || len(strings.TrimSpace(row[keyColIndex].(Key))) == 0 {
 			if errorIfMissing {
-				return nil, &keyMissingError{tab: tabName, line: actualRow}
+				return nil, newKeyMissingError(tabName, actualRow, keyColIndex)
 			} else {
-				log.Println(&keyMissingError{tab: tabName, line: actualRow})
+				log.Println(newKeyMissingError(tabName, actualRow, keyColIndex))
 				continue
 			}
 		}
@@ -80,43 +79,47 @@ func keyLocalizations(
 			val := strings.TrimSpace(row[i].(string))
 			if len(val) > 0 {
 				valWithoutSpecChars := withReplacedSpecialChars(platform, val)
-				finalValue := withReplacedFormats(platform, valWithoutSpecChars, formats, tab, line)
+				finalValue, err := withReplacedFormats(platform, valWithoutSpecChars, formats, tab, line, i)
+				if err != nil {
+					return nil, err
+				}
 				keyLoc[lang] = finalValue
 			} else if errorIfMissing {
-				return nil, &localizationMissingError{tab: tab, line: line, key: key, lang: lang}
+				return nil, newLocalizationMissingError(tab, line, i, key, lang)
 			} else {
-				log.Println(&localizationMissingError{tab: tab, line: line, key: key, lang: lang})
+				log.Println(newLocalizationMissingError(tab, line, i, key, lang))
 			}
 		} else if errorIfMissing {
-			return nil, &localizationMissingError{tab: tab, line: line, key: key, lang: lang}
+			return nil, newLocalizationMissingError(tab, line, i, key, lang)
 		} else {
-			log.Println(&localizationMissingError{tab: tab, line: line, key: key, lang: lang})
+			log.Println(newLocalizationMissingError(tab, line, i, key, lang))
 		}
 	}
 	return keyLoc, nil
 }
 
-func withReplacedFormats(platform Platform, str string, formats Formats, tab string, line int) string {
+func withReplacedFormats(platform Platform, str string, formats Formats, tab string, row int, column int) (string, error) {
 	var index uint = 0
-	return FormatRegexp().ReplaceAllStringFunc(str, func(formatName string) string {
+	var err error
+	strWithReplacedFormats := FormatRegexp().ReplaceAllStringFunc(str, func(formatName string) string {
 		if len(formatName) < 2 {
-			log.Fatalf(`%v!%v: something went wrong. Please submit an issue with the values in the problematic row.`, tab, line)
+			log.Fatalf(`%v: something went wrong. Please submit an issue with the values in the problematic row.`, Cell{tab, uint(row), uint(column)})
 		}
 
 		name := formatName[1 : len(formatName)-1]
 		if format, ok := formats[name]; ok {
-			str, err := platform.IndexedFormatString(index, format)
-			if err != nil {
-				log.Fatalf(`%v!%v: can't use the "%v" format. Reason: %v`, tab, line, name, err)
-			}
-			return str
+			return platform.IndexedFormatString(index, format)
 		} else {
-			log.Fatalf(`%v!%v: no such format - "%v".`, tab, line, name)
+			if err == nil {
+				err = &formatNotFoundError{Cell{tab, uint(row), uint(column)}, name}
+			}
 		}
 
 		index += 1
 		return str
 	})
+
+	return strWithReplacedFormats, err
 }
 
 func withReplacedSpecialChars(platform Platform, str string) string {
@@ -131,22 +134,69 @@ func withReplacedSpecialChars(platform Platform, str string) string {
 	return strings.NewReplacer(replacements...).Replace(str)
 }
 
+type firstRowNotFoundError struct {
+	cell Cell
+}
+
+func (e *firstRowNotFoundError) Error() string {
+	return fmt.Sprintf(`%v: there's no first row in the tab`, e.cell)
+}
+
+type columnNotFoundError struct {
+	cell   Cell
+	column string
+}
+
+func (e *columnNotFoundError) Error() string {
+	return fmt.Sprintf(`%v: "%v" column not found in the first row`, e.cell, e.column)
+}
+
+type langColumnsNotFoundError struct {
+	cell Cell
+}
+
+func (e *langColumnsNotFoundError) Error() string {
+	return fmt.Sprintf(`%v: language columns are not found`, e.cell)
+}
+
 type localizationMissingError struct {
-	tab  string
-	line int
-	key  string
-	lang string
+	cell     Cell
+	key      string
+	lang     string
+	platform Platform
+}
+
+func newLocalizationMissingError(tab string, row int, col int, key string, lang string) *localizationMissingError {
+	return &localizationMissingError{
+		cell: *NewCell(tab, uint(row), uint(col)),
+		key:  key,
+		lang: lang,
+	}
 }
 
 func (e *localizationMissingError) Error() string {
-	return fmt.Sprintf(`%v!%v: "%v" is missing for "%v" language`, e.tab, e.line, e.key, e.lang)
+	return fmt.Sprintf(`%v: "%v" is missing for "%v" language`, e.cell, e.key, e.lang)
 }
 
 type keyMissingError struct {
-	tab  string
-	line int
+	cell Cell
+}
+
+func newKeyMissingError(tab string, row int, col int) *keyMissingError {
+	return &keyMissingError{
+		cell: *NewCell(tab, uint(row), uint(col)),
+	}
 }
 
 func (e *keyMissingError) Error() string {
-	return fmt.Sprintf(`%v!%v: key name is missing, ignoring this string...`, e.tab, e.line)
+	return fmt.Sprintf(`%v: key name is missing, ignoring this string...`, e.cell)
+}
+
+type formatNotFoundError struct {
+	cell       Cell
+	formatName string
+}
+
+func (e *formatNotFoundError) Error() string {
+	return fmt.Sprintf(`%v: no such format - "%v"`, e.cell, e.formatName)
 }
