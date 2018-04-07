@@ -4,8 +4,8 @@ type Platform interface {
 	// Returns platform names that can be used to identify it in the sheet.
 	Names() []string
 
-	// Returns replacement characters for any special character that needs to be guarded in the platform resources.
-	ReplacementChars() map[string]string
+	// Returns a full relative path to localization file for a given language.
+	LocalizationFilePath(lang Lang, resDir ResDir) string
 
 	// Returns header text. Can be an empty string. Newlines must be included here if localization format requires them.
 	Header(lang Lang) string
@@ -24,6 +24,6 @@ type Platform interface {
 	// Example 2: format strings on iOS aren't positional. In this case invocation of IndexedFormatString(0, "@") would return "%@".
 	IndexedFormatString(index uint, format string) string
 
-	// Returns a full relative path to localization file for a given language.
-	LocalizationFilePath(lang Lang, resDir ResDir) string
+	// Returns replacement characters for any special character that needs to be guarded in the platform resources.
+	ReplacementChars() map[string]string
 }

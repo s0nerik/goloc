@@ -22,6 +22,16 @@ func (android) Names() []string {
 	}
 }
 
+func (android) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
+	fileName := "localized_strings.xml"
+	targetDir := fmt.Sprintf("values-%v", lang)
+	if resDir != "" {
+		return filepath.Join(resDir, targetDir, fileName)
+	} else {
+		return filepath.Join("src", "main", "res", targetDir, fileName)
+	}
+}
+
 func (android) Header(lang goloc.Lang) string {
 	return "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<resources>\n"
 }
@@ -43,16 +53,6 @@ func (android) ValidateFormat(format string) error {
 
 func (android) IndexedFormatString(index uint, format string) string {
 	return fmt.Sprintf(`%%%v$%v`, index+1, format)
-}
-
-func (android) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
-	fileName := "localized_strings.xml"
-	targetDir := fmt.Sprintf("values-%v", lang)
-	if resDir != "" {
-		return filepath.Join(resDir, targetDir, fileName)
-	} else {
-		return filepath.Join("src", "main", "res", targetDir, fileName)
-	}
 }
 
 func (android) ReplacementChars() map[string]string {
