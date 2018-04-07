@@ -11,12 +11,11 @@ func init() {
 
 type ios struct{}
 
-func (ios) String() string {
-	panic("implement me")
-}
-
 func (ios) Names() []string {
-	panic("implement me")
+	return []string{
+		"ios",
+		"iOS",
+	}
 }
 
 func (ios) ReplacementChars() map[string]string {
@@ -43,10 +42,6 @@ func (ios) IndexedFormatString(index uint, format string) string {
 	panic("implement me")
 }
 
-func (ios) LocalizationDirPath(lang goloc.Lang, resDir goloc.ResDir) string {
-	panic("implement me")
-}
-
-func (ios) LocalizationFileName(lang goloc.Lang) string {
+func (ios) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
 	panic("implement me")
 }

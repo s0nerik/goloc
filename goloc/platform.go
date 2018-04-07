@@ -1,11 +1,6 @@
 package goloc
 
-import "fmt"
-
 type Platform interface {
-	// Each platform must provide it's name through String() method.
-	fmt.Stringer
-
 	// Returns platform names that can be used to identify it in the sheet.
 	Names() []string
 
@@ -29,9 +24,6 @@ type Platform interface {
 	// Example 2: format strings on iOS aren't positional. In this case invocation of IndexedFormatString(0, "@") would return "%@".
 	IndexedFormatString(index uint, format string) string
 
-	// Returns a directory for localization file for a given language.
-	LocalizationDirPath(lang Lang, resDir ResDir) string
-
-	// Returns a localization file name for a given language.
-	LocalizationFileName(lang Lang) string
+	// Returns a full relative path to localization file for a given language.
+	LocalizationFilePath(lang Lang, resDir ResDir) string
 }
