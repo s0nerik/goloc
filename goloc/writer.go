@@ -3,7 +3,6 @@ package goloc
 import (
 	"os"
 	"bufio"
-	"errors"
 	"fmt"
 	"path/filepath"
 	"path"
@@ -48,28 +47,18 @@ func WriteLocalizations(
 					return err
 				}
 
-				// Open a new writer for the localization file
-				writer := bufio.NewWriter(file)
-				if writer == nil {
-					return errors.New(fmt.Sprintf(`can't create a bufio.Writer for %v`, file))
-				}
-
-				writers[lang] = writer
+				// Create a new writer for the localization file
+				writers[lang] = bufio.NewWriter(file)
 
 				// Write a header
 				_, err = writer.WriteString(platform.Header(lang))
 				if err != nil {
-					return errors.New(fmt.Sprintf(`can't write header to %v, reason: %v`, file, err))
+					return err
 				}
 			} else { // Use an existing writer to write another localized string
-				localizedString := platform.Localization(lang, key, value)
-				if len(localizedString) < 1 {
-					return errors.New(fmt.Sprintf(`can't write a new line to %v, reason: %v`, file, err))
-				}
-
-				_, err := writer.WriteString(localizedString)
+				_, err := writer.WriteString(platform.Localization(lang, key, value))
 				if err != nil {
-					return errors.New(fmt.Sprintf(`can't write a new line to %v, reason: %v`, file, err))
+					return err
 				}
 			}
 		}
@@ -79,12 +68,12 @@ func WriteLocalizations(
 	for lang, writer := range writers {
 		_, err := writer.WriteString(platform.Footer(lang))
 		if err != nil {
-			return errors.New(fmt.Sprintf(`can't write footer to %v, reason: %v`, file, err))
+			return err
 		}
 
 		err = writer.Flush()
 		if err != nil {
-			return errors.New(fmt.Sprintf(`can't write to %v, reason: %v`, file, err))
+			return err
 		}
 	}
 
