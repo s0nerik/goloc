@@ -13,7 +13,7 @@ func WriteLocalizations(
 	platform Platform,
 	dir ResDir,
 	localizations Localizations,
-	defLocLang string,
+	defLocLang Lang,
 	defLocPath string,
 ) error {
 	// Make sure the the resources dir exists
@@ -28,17 +28,7 @@ func WriteLocalizations(
 	for key, keyLoc := range localizations {
 		for lang, value := range keyLoc {
 			if writer, ok := writers[lang]; !ok { // Create a new writer and write a header to it if needed
-				var resDir string
-				var fileName string
-
-				// Handle default language
-				if len(defLocLang) > 0 && lang == defLocLang && len(defLocPath) > 0 {
-					resDir = path.Dir(defLocPath)
-					fileName = path.Base(defLocPath)
-				} else {
-					resDir = platform.LocalizationDirPath(lang, dir)
-					fileName = platform.LocalizationFileName(lang)
-				}
+				resDir, fileName := localizationFilePath(platform, dir, lang, defLocLang, defLocPath)
 
 				// Create all intermediate directories
 				err := os.MkdirAll(resDir, os.ModePerm)
@@ -95,4 +85,16 @@ func WriteLocalizations(
 	}
 
 	return nil
+}
+
+func localizationFilePath(platform Platform, dir ResDir, lang Lang, defLocLang Lang, defLocPath string) (resDir string, fileName string) {
+	// Handle default language
+	if len(defLocLang) > 0 && lang == defLocLang && len(defLocPath) > 0 {
+		resDir = path.Dir(defLocPath)
+		fileName = path.Base(defLocPath)
+	} else {
+		resDir = platform.LocalizationDirPath(lang, dir)
+		fileName = platform.LocalizationFileName(lang)
+	}
+	return
 }
