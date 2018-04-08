@@ -11,32 +11,9 @@ func ParseFormats(
 	formatsTabName string,
 	formatColumnTitle string,
 ) (Formats, error) {
-	firstRow := rawData[0]
-	if firstRow == nil {
-		return nil, &noFirstRowError{tab: formatsTabName}
-	}
-
-	var formatColIndex = -1
-	var platformColIndex = -1
-	var actualPlatformName = ``
-	for i, val := range firstRow {
-		if val == formatColumnTitle {
-			formatColIndex = i
-		}
-		for _, name := range platform.Names() {
-			if val == name {
-				platformColIndex = i
-				actualPlatformName = name
-			}
-		}
-	}
-
-	if formatColIndex == -1 {
-		return nil, &noFormatColumnError{tab: formatsTabName, requiredColumnTitle: formatColumnTitle}
-	}
-
-	if platformColIndex == -1 {
-		return nil, &noPlatformColumnError{tab: formatsTabName, platformNames: platform.Names()}
+	formatColIndex, platformColIndex, actualPlatformName, err := columnIndices(platform, rawData, formatsTabName, formatColumnTitle)
+	if err != nil {
+		return nil, err
 	}
 
 	formats := Formats{}
@@ -87,9 +64,57 @@ func ParseFormats(
 	return formats, nil
 }
 
+func columnIndices(
+	platform Platform,
+	rawData [][]interface{},
+	formatsTabName string,
+	formatColumnTitle string,
+) (formatColIndex int, platformColIndex int, actualPlatformName string, err error) {
+	formatColIndex = -1
+	platformColIndex = -1
+	actualPlatformName = ``
+
+	if len(rawData) == 0 {
+		err = &emptySheetError{tab: formatsTabName}
+		return
+	}
+
+	firstRow := rawData[0]
+	if len(firstRow) == 0 {
+		err = &emptyFirstRowError{tab: formatsTabName}
+		return
+	}
+
+	for i, val := range firstRow {
+		if val == formatColumnTitle {
+			formatColIndex = i
+		}
+		for _, name := range platform.Names() {
+			if val == name {
+				platformColIndex = i
+				actualPlatformName = name
+			}
+		}
+	}
+
+	if formatColIndex == -1 {
+		err = &noFormatColumnError{tab: formatsTabName, requiredColumnTitle: formatColumnTitle}
+	}
+
+	if platformColIndex == -1 {
+		err = &noPlatformColumnError{tab: formatsTabName, platformNames: platform.Names()}
+	}
+
+	return
+}
+
 // region Errors
 
-type noFirstRowError struct {
+type emptySheetError struct {
+	tab string
+}
+
+type emptyFirstRowError struct {
 	tab string
 }
 
@@ -127,7 +152,11 @@ type wrongKeyTypeError struct {
 	cell Cell
 }
 
-func (e *noFirstRowError) Error() string {
+func (e *emptySheetError) Error() string {
+	return fmt.Sprintf(`%v!A1: sheet is empty`, e.tab)
+}
+
+func (e *emptyFirstRowError) Error() string {
 	return fmt.Sprintf(`%v!A1: first row is required`, e.tab)
 }
 
