@@ -44,48 +44,100 @@ func (p mockPlatform) ReplacementChars() map[string]string {
 }
 
 func TestEmptyData(t *testing.T) {
-	var emptyData [][]interface{}
+	var data [][]interface{}
 
 	platform := &mockPlatform{}
-	_, err := ParseFormats(emptyData, platform, "", "")
+	_, err := ParseFormats(data, platform, "", "")
 	if assert.Error(t, err) {
 		assert.IsType(t, &emptySheetError{}, err)
 	}
 }
 
 func TestEmptyFirstRow(t *testing.T) {
-	emptyFirstRowData := [][]interface{}{
+	data := [][]interface{}{
 		{},
 		{"x"},
 	}
 
 	platform := &mockPlatform{}
-	_, err := ParseFormats(emptyFirstRowData, platform, "", "")
+	_, err := ParseFormats(data, platform, "", "")
 	if assert.Error(t, err) {
 		assert.IsType(t, &emptyFirstRowError{}, err)
 	}
 }
 
 func TestMissingFormatColumn(t *testing.T) {
-	emptyFirstRowData := [][]interface{}{
+	data := [][]interface{}{
 		{"mock"},
 	}
 
 	platform := &mockPlatform{}
-	_, err := ParseFormats(emptyFirstRowData, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format")
 	if assert.Error(t, err) {
 		assert.IsType(t, &noFormatColumnError{}, err)
 	}
 }
 
 func TestMissingPlatformColumn(t *testing.T) {
-	emptyFirstRowData := [][]interface{}{
+	data := [][]interface{}{
 		{"format"},
 	}
 
 	platform := &mockPlatform{}
-	_, err := ParseFormats(emptyFirstRowData, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format")
 	if assert.Error(t, err) {
 		assert.IsType(t, &noPlatformColumnError{}, err)
+	}
+}
+
+func TestMissingFormatKey(t *testing.T) {
+	data := [][]interface{}{
+		{"mock", "format"},
+		{""},
+	}
+
+	platform := &mockPlatform{}
+	_, err := ParseFormats(data, platform, "", "format")
+	if assert.Error(t, err) {
+		assert.IsType(t, &formatKeyNotSpecifiedError{}, err)
+	}
+}
+
+func TestMissingFormatValue1(t *testing.T) {
+	data := [][]interface{}{
+		{"format", "mock"},
+		{""},
+	}
+
+	platform := &mockPlatform{}
+	_, err := ParseFormats(data, platform, "", "format")
+	if assert.Error(t, err) {
+		assert.IsType(t, &formatValueNotSpecifiedError{}, err)
+	}
+}
+
+func TestMissingFormatValue2(t *testing.T) {
+	data := [][]interface{}{
+		{"format", "mock"},
+		{"x", ""},
+	}
+
+	platform := &mockPlatform{}
+	_, err := ParseFormats(data, platform, "", "format")
+	if assert.Error(t, err) {
+		assert.IsType(t, &formatValueNotSpecifiedError{}, err)
+	}
+}
+
+func TestMissingFormatValue3(t *testing.T) {
+	data := [][]interface{}{
+		{"format", "mock"},
+		{"x", "   "},
+	}
+
+	platform := &mockPlatform{}
+	_, err := ParseFormats(data, platform, "", "format")
+	if assert.Error(t, err) {
+		assert.IsType(t, &formatValueNotSpecifiedError{}, err)
 	}
 }
