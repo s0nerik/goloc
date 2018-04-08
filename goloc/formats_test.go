@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEmptyData(t *testing.T) {
+func TestFormatsEmptyData(t *testing.T) {
 	var data [][]interface{}
 
 	platform := newMockPlatform(nil)
@@ -15,7 +15,7 @@ func TestEmptyData(t *testing.T) {
 	}
 }
 
-func TestEmptyFirstRow(t *testing.T) {
+func TestFormatsEmptyFirstRow(t *testing.T) {
 	data := [][]interface{}{
 		{},
 		{"x"},
@@ -24,11 +24,11 @@ func TestEmptyFirstRow(t *testing.T) {
 	platform := newMockPlatform(nil)
 	_, err := ParseFormats(data, platform, "", "")
 	if assert.Error(t, err) {
-		assert.IsType(t, &emptyFirstRowError{}, err)
+		assert.IsType(t, &firstRowNotFoundError{}, err)
 	}
 }
 
-func TestMissingFormatColumn(t *testing.T) {
+func TestFormatsMissingFormatColumn(t *testing.T) {
 	data := [][]interface{}{
 		{"mock"},
 	}
@@ -40,7 +40,7 @@ func TestMissingFormatColumn(t *testing.T) {
 	}
 }
 
-func TestMissingPlatformColumn(t *testing.T) {
+func TestFormatsMissingPlatformColumn(t *testing.T) {
 	data := [][]interface{}{
 		{"format"},
 	}
@@ -52,7 +52,7 @@ func TestMissingPlatformColumn(t *testing.T) {
 	}
 }
 
-func TestMissingFormatKey(t *testing.T) {
+func TestFormatsMissingFormatKey(t *testing.T) {
 	data := [][]interface{}{
 		{"mock", "format"},
 		{""},
@@ -65,7 +65,7 @@ func TestMissingFormatKey(t *testing.T) {
 	}
 }
 
-func TestMissingFormatValue1(t *testing.T) {
+func TestFormatsMissingFormatValue1(t *testing.T) {
 	data := [][]interface{}{
 		{"format", "mock"},
 		{""},
@@ -78,7 +78,7 @@ func TestMissingFormatValue1(t *testing.T) {
 	}
 }
 
-func TestMissingFormatValue2(t *testing.T) {
+func TestFormatsMissingFormatValue2(t *testing.T) {
 	data := [][]interface{}{
 		{"format", "mock"},
 		{"x", ""},
@@ -91,7 +91,7 @@ func TestMissingFormatValue2(t *testing.T) {
 	}
 }
 
-func TestMissingFormatValue3(t *testing.T) {
+func TestFormatsMissingFormatValue3(t *testing.T) {
 	data := [][]interface{}{
 		{"format", "mock"},
 		{"x", "   "},
@@ -104,7 +104,7 @@ func TestMissingFormatValue3(t *testing.T) {
 	}
 }
 
-func TestFormatValidation(t *testing.T) {
+func TestFormatsFormatValidation(t *testing.T) {
 	data := [][]interface{}{
 		{"format", "mock"},
 		{"x", "s"},
@@ -127,7 +127,7 @@ func TestFormatValidation(t *testing.T) {
 	platform.AssertNumberOfCalls(t, "ValidateFormat", 2)
 }
 
-func TestWrongValueType(t *testing.T) {
+func TestFormatsWrongValueType(t *testing.T) {
 	data := [][]interface{}{
 		{"format", "mock"},
 		{"x", "s"},
@@ -147,7 +147,7 @@ func TestWrongValueType(t *testing.T) {
 	platform.AssertNumberOfCalls(t, "ValidateFormat", 1)
 }
 
-func TestWrongKeyType(t *testing.T) {
+func TestFormatsWrongKeyType(t *testing.T) {
 	data := [][]interface{}{
 		{"format", "mock"},
 		{"x", "s"},

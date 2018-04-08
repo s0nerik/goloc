@@ -1,7 +1,6 @@
 package goloc
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -81,7 +80,7 @@ func columnIndices(
 
 	firstRow := rawData[0]
 	if len(firstRow) == 0 {
-		err = &emptyFirstRowError{tab: formatsTabName}
+		err = &firstRowNotFoundError{Cell{formatsTabName, uint(1), 0}}
 		return
 	}
 
@@ -107,85 +106,3 @@ func columnIndices(
 
 	return
 }
-
-// region Errors
-
-type emptySheetError struct {
-	tab string
-}
-
-type emptyFirstRowError struct {
-	tab string
-}
-
-type noFormatColumnError struct {
-	tab                 string
-	requiredColumnTitle string
-}
-
-type noPlatformColumnError struct {
-	tab           string
-	platformNames []string
-}
-
-type formatKeyNotSpecifiedError struct {
-	cell Cell
-}
-
-type formatValueNotSpecifiedError struct {
-	platformName string
-	cell         Cell
-}
-
-type formatValueInvalidError struct {
-	cell         Cell
-	platformName string
-	formatValue  string
-	reason       error
-}
-
-type wrongValueTypeError struct {
-	cell Cell
-}
-
-type wrongKeyTypeError struct {
-	cell Cell
-}
-
-func (e *emptySheetError) Error() string {
-	return fmt.Sprintf(`%v!A1: sheet is empty`, e.tab)
-}
-
-func (e *emptyFirstRowError) Error() string {
-	return fmt.Sprintf(`%v!A1: first row is required`, e.tab)
-}
-
-func (e *noFormatColumnError) Error() string {
-	return fmt.Sprintf(`%v!A1: "%v" column is missing in the first row`, e.tab, e.requiredColumnTitle)
-}
-
-func (e *noPlatformColumnError) Error() string {
-	return fmt.Sprintf(`%v!A1: can't find any of %v columns in the first row`, e.tab, e.platformNames)
-}
-
-func (e *formatKeyNotSpecifiedError) Error() string {
-	return fmt.Sprintf(`%v: format name is not specified`, e.cell)
-}
-
-func (e *formatValueNotSpecifiedError) Error() string {
-	return fmt.Sprintf(`%v: value for "%v" platform is not specified`, e.cell, e.platformName)
-}
-
-func (e *formatValueInvalidError) Error() string {
-	return fmt.Sprintf(`%v: format "%v" is invalid for platform "%v" (%v)`, e.cell, e.formatValue, e.platformName, e.reason)
-}
-
-func (e *wrongValueTypeError) Error() string {
-	return fmt.Sprintf(`%v: wrong value type`, e.cell)
-}
-
-func (e *wrongKeyTypeError) Error() string {
-	return fmt.Sprintf(`%v: wrong key type`, e.cell)
-}
-
-// endregion
