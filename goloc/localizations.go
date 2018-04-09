@@ -56,7 +56,7 @@ func localizationColumnIndices(
 	}
 
 	firstRow := rawData[0]
-	if firstRow == nil {
+	if len(firstRow) == 0 {
 		err = &firstRowNotFoundError{Cell{tabName, uint(1), uint(0)}}
 		return
 	}
