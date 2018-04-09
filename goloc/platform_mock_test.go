@@ -54,12 +54,12 @@ func newMockPlatform(customMocksProvider func(p *mockPlatform)) *mockPlatform {
 		customMocksProvider(p)
 	}
 	p.On("Names").Return([]string{"mock"})
-	p.On("LocalizationFilePath").Return("")
-	p.On("Header").Return("")
-	p.On("Localization").Return("")
-	p.On("Footer").Return("")
+	p.On("LocalizationFilePath", mock.AnythingOfType("Lang"), mock.AnythingOfType("ResDir")).Return("")
+	p.On("Header", mock.AnythingOfType("Lang")).Return("")
+	p.On("Localization", mock.AnythingOfType("Lang"), mock.AnythingOfType("Key"), mock.AnythingOfType("string")).Return("")
+	p.On("Footer", mock.AnythingOfType("Lang")).Return("")
 	p.On("ValidateFormat", mock.AnythingOfType("string")).Return(nil)
-	p.On("IndexedFormatString").Return("")
-	p.On("ReplacementChars").Return(nil)
+	p.On("IndexedFormatString", mock.AnythingOfType("uint"), mock.AnythingOfType("string")).Return("")
+	p.On("ReplacementChars").Return(map[string]string{})
 	return p
 }
