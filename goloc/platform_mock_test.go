@@ -60,6 +60,8 @@ func newMockPlatform(customMocksProvider func(p *mockPlatform)) *mockPlatform {
 	p.On("Footer", mock.AnythingOfType("Lang")).Return("")
 	p.On("ValidateFormat", mock.AnythingOfType("string")).Return(nil)
 	p.On("IndexedFormatString", mock.AnythingOfType("uint"), mock.AnythingOfType("string")).Return("")
-	p.On("ReplacementChars").Return(map[string]string{})
+	p.On("ReplacementChars").Return(map[string]string{
+		`~`: `tilde`,
+	})
 	return p
 }
