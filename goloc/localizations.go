@@ -14,32 +14,38 @@ func ParseLocalizations(
 	tabName string,
 	keyColumn string,
 	errorIfMissing bool,
-) (Localizations, error) {
+) (loc Localizations, warnings []error, error error) {
 	keyColIndex, langColumns, err := localizationColumnIndices(rawData, tabName, keyColumn)
 	if err != nil {
-		return nil, err
+		error = err
+		return
 	}
 
-	loc := Localizations{}
+	loc = Localizations{}
 	for index, row := range rawData[1:] {
 		actualRow := index + 2
 		if keyColIndex >= len(row) || len(strings.TrimSpace(row[keyColIndex].(Key))) == 0 {
 			if errorIfMissing {
-				return nil, newKeyMissingError(tabName, actualRow, keyColIndex)
+				error = newKeyMissingError(tabName, actualRow, keyColIndex)
+				return
 			} else {
-				log.Println(newKeyMissingError(tabName, actualRow, keyColIndex))
+				warnings = append(warnings, newKeyMissingError(tabName, actualRow, keyColIndex))
 				continue
 			}
 		}
 		key := strings.TrimSpace(row[keyColIndex].(Key))
-		if keyLoc, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langColumns, errorIfMissing); err == nil {
+		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langColumns, errorIfMissing); err == nil {
+			if len(warn) > 0 {
+				warnings = append(warnings, warn...)
+			}
 			loc[key] = keyLoc
 		} else {
-			return nil, err
+			error = err
+			return
 		}
 	}
 
-	return loc, nil
+	return
 }
 
 func localizationColumnIndices(
@@ -93,8 +99,8 @@ func keyLocalizations(
 	key Key,
 	langColumns langColumns,
 	errorIfMissing bool,
-) (map[Key]string, error) {
-	keyLoc := map[Key]string{}
+) (keyLoc map[Key]string, warnings []error, error error) {
+	keyLoc = map[Key]string{}
 	for i, lang := range langColumns {
 		if i < len(row) {
 			val := strings.TrimSpace(row[i].(string))
@@ -102,21 +108,24 @@ func keyLocalizations(
 				valWithoutSpecChars := withReplacedSpecialChars(platform, val)
 				finalValue, err := withReplacedFormats(platform, valWithoutSpecChars, formats, tab, line, i)
 				if err != nil {
-					return nil, err
+					error = err
+					return
 				}
 				keyLoc[lang] = finalValue
 			} else if errorIfMissing {
-				return nil, newLocalizationMissingError(tab, line, i, key, lang)
+				error = newLocalizationMissingError(tab, line, i, key, lang)
+				return
 			} else {
-				log.Println(newLocalizationMissingError(tab, line, i, key, lang))
+				warnings = append(warnings, newLocalizationMissingError(tab, line, i, key, lang))
 			}
 		} else if errorIfMissing {
-			return nil, newLocalizationMissingError(tab, line, i, key, lang)
+			error = newLocalizationMissingError(tab, line, i, key, lang)
+			return
 		} else {
-			log.Println(newLocalizationMissingError(tab, line, i, key, lang))
+			warnings = append(warnings, newLocalizationMissingError(tab, line, i, key, lang))
 		}
 	}
-	return keyLoc, nil
+	return
 }
 
 func withReplacedFormats(platform Platform, str string, formats Formats, tab string, row int, column int) (string, error) {

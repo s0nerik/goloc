@@ -133,9 +133,13 @@ func Run(
 		log.Fatal(err)
 	}
 
-	localizations, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing)
+	localizations, warn, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing)
 	if err != nil {
 		log.Fatal(err)
+	} else {
+		for _, w := range warn {
+			log.Println(w)
+		}
 	}
 
 	err = WriteLocalizations(platform, resDir, localizations, defaultLocalization, defaultLocalizationPath)
