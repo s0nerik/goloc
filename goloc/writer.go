@@ -48,7 +48,8 @@ func WriteLocalizations(
 				}
 
 				// Create a new writer for the localization file
-				writers[lang] = bufio.NewWriter(file)
+				writer = bufio.NewWriter(file)
+				writers[lang] = writer
 
 				// Write a header
 				_, err = writer.WriteString(platform.Header(lang))
@@ -92,7 +93,7 @@ func localizationFilePath(platform Platform, dir ResDir, lang Lang, defLocLang L
 		}
 
 		resDir = path.Dir(filePath)
-		fileName = path.Base(fileName)
+		fileName = path.Base(filePath)
 	}
 	return
 }

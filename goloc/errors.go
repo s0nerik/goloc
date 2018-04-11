@@ -55,7 +55,7 @@ type langColumnsNotFoundError struct {
 
 type localizationMissingError struct {
 	cell     Cell
-	key      string
+	key      Key
 	lang     string
 	platform Platform
 }
@@ -69,7 +69,7 @@ type formatNotFoundError struct {
 	formatName string
 }
 
-func newLocalizationMissingError(tab string, row int, col int, key string, lang string) *localizationMissingError {
+func newLocalizationMissingError(tab string, row int, col int, key Key, lang string) *localizationMissingError {
 	return &localizationMissingError{
 		cell: *NewCell(tab, uint(row), uint(col)),
 		key:  key,

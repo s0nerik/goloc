@@ -8,6 +8,10 @@ import (
 	"golang.org/x/net/context"
 	"regexp"
 	"sync"
+	"github.com/olekukonko/tablewriter"
+	"os"
+	"strconv"
+	"strings"
 )
 
 type Lang = string
@@ -120,6 +124,7 @@ func Run(
 	defaultLocalization string,
 	defaultLocalizationPath string,
 	stopOnMissing bool,
+	reportMissingLocalizations bool,
 ) {
 	api := sheetsApi(credFilePath)
 
@@ -137,8 +142,13 @@ func Run(
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		for _, w := range warn {
-			log.Println(w)
+		if reportMissingLocalizations {
+			reportMissingLanguages(warn)
+			return
+		} else {
+			for _, w := range warn {
+				log.Println(w)
+			}
 		}
 	}
 
@@ -146,4 +156,28 @@ func Run(
 	if err != nil {
 		log.Fatalf(`Can't write localizations. Reason: %v.`, err)
 	}
+}
+
+func reportMissingLanguages(warnings []error) {
+	keyWarnings := map[Key][]*localizationMissingError{}
+	for _, w := range warnings {
+		if w, ok := w.(*localizationMissingError); ok {
+			keyWarnings[w.key] = append(keyWarnings[w.key], w)
+		}
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Row", "Key", "Missing localizations"})
+	for _, warnings := range keyWarnings {
+		row := warnings[0].cell.row
+		key := warnings[0].key
+
+		var missingLanguages []string
+		for _, w := range warnings {
+			missingLanguages = append(missingLanguages, w.lang)
+		}
+
+		table.Append([]string{strconv.Itoa(int(row)), key, strings.Join(missingLanguages, ",")})
+	}
+	table.Render()
 }
