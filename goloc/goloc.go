@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sort"
 )
 
 type Lang = string
@@ -159,21 +160,35 @@ func Run(
 }
 
 func reportMissingLanguages(warnings []error) {
-	keyWarnings := map[Key][]*localizationMissingError{}
+	rowWarnings := map[uint][]*localizationMissingError{}
 	for _, w := range warnings {
 		if w, ok := w.(*localizationMissingError); ok {
-			keyWarnings[w.key] = append(keyWarnings[w.key], w)
+			rowWarnings[w.cell.row] = append(rowWarnings[w.cell.row], w)
 		}
 	}
 
+	type kv struct {
+		row      uint
+		warnings []*localizationMissingError
+	}
+
+	var sortedRowWarnings []kv
+	for k, v := range rowWarnings {
+		sortedRowWarnings = append(sortedRowWarnings, kv{k, v})
+	}
+
+	sort.Slice(sortedRowWarnings, func(i, j int) bool {
+		return sortedRowWarnings[i].row < sortedRowWarnings[j].row
+	})
+
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Row", "Key", "Missing localizations"})
-	for _, warnings := range keyWarnings {
-		row := warnings[0].cell.row
-		key := warnings[0].key
+	for _, kv := range sortedRowWarnings {
+		row := kv.warnings[0].cell.row
+		key := kv.warnings[0].key
 
 		var missingLanguages []string
-		for _, w := range warnings {
+		for _, w := range kv.warnings {
 			missingLanguages = append(missingLanguages, w.lang)
 		}
 
