@@ -27,9 +27,8 @@ func (ios) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
 	targetDir := fmt.Sprintf("%v.lproj", lang)
 	if resDir != "" {
 		return filepath.Join(resDir, targetDir, fileName)
-	} else {
-		return filepath.Join("Resources", "Localization", targetDir, fileName)
 	}
+	return filepath.Join("Resources", "Localization", targetDir, fileName)
 }
 
 func (ios) Header(lang goloc.Lang) string {

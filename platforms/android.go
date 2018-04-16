@@ -27,9 +27,8 @@ func (android) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string
 	targetDir := fmt.Sprintf("values-%v", lang)
 	if resDir != "" {
 		return filepath.Join(resDir, targetDir, fileName)
-	} else {
-		return filepath.Join("src", "main", "res", targetDir, fileName)
 	}
+	return filepath.Join("src", "main", "res", targetDir, fileName)
 }
 
 func (android) Header(lang goloc.Lang) string {

@@ -3,10 +3,13 @@ package goloc
 import (
 	"log"
 	"strings"
+	"github.com/s0nerik/goloc/goloc/re"
 )
 
 type langColumns = map[int]Lang
 
+// ParseLocalizations parses formats given the raw table data and returns, if successful, mappings
+// for each localized string in different languages.
 func ParseLocalizations(
 	rawData [][]interface{},
 	platform Platform,
@@ -28,10 +31,9 @@ func ParseLocalizations(
 			if errorIfMissing {
 				error = newKeyMissingError(tabName, actualRow, keyColIndex)
 				return
-			} else {
-				warnings = append(warnings, newKeyMissingError(tabName, actualRow, keyColIndex))
-				continue
 			}
+			warnings = append(warnings, newKeyMissingError(tabName, actualRow, keyColIndex))
+			continue
 		}
 		key := strings.TrimSpace(row[keyColIndex].(Key))
 		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langColumns, errorIfMissing); err == nil {
@@ -71,7 +73,7 @@ func localizationColumnIndices(
 		if val == keyColumn {
 			keyColIndex = i
 		}
-		lang := LangColumnNameRegexp().FindStringSubmatch(val.(string))
+		lang := re.LangColumnNameRegexp().FindStringSubmatch(val.(string))
 		if lang != nil {
 			langCols[i] = lang[1]
 		}
@@ -129,9 +131,9 @@ func keyLocalizations(
 }
 
 func withReplacedFormats(platform Platform, str string, formats Formats, tab string, row int, column int) (string, error) {
-	var index uint = 0
+	var index uint
 	var err error
-	strWithReplacedFormats := FormatRegexp().ReplaceAllStringFunc(str, func(formatName string) string {
+	strWithReplacedFormats := re.FormatRegexp().ReplaceAllStringFunc(str, func(formatName string) string {
 		if len(formatName) < 2 {
 			log.Fatalf(`%v: something went wrong. Please submit an issue with the values in the problematic row.`, Cell{tab, uint(row), uint(column)})
 		}
@@ -139,13 +141,12 @@ func withReplacedFormats(platform Platform, str string, formats Formats, tab str
 		name := formatName[1 : len(formatName)-1]
 		if format, ok := formats[name]; ok {
 			return platform.IndexedFormatString(index, format)
-		} else {
-			if err == nil {
-				err = &formatNotFoundError{Cell{tab, uint(row), uint(column)}, name}
-			}
+		}
+		if err == nil {
+			err = &formatNotFoundError{Cell{tab, uint(row), uint(column)}, name}
 		}
 
-		index += 1
+		index++
 		return str
 	})
 

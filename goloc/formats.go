@@ -4,6 +4,8 @@ import (
 	"strings"
 )
 
+// ParseFormats parses formats given the raw table data and returns, if successful, mappings
+// to the actual platform format for each format name.
 func ParseFormats(
 	rawData [][]interface{},
 	platform Platform,

@@ -8,6 +8,7 @@ import (
 	"path"
 )
 
+// WriteLocalizations writes localization files into platform-defined directories.
 func WriteLocalizations(
 	platform Platform,
 	dir ResDir,

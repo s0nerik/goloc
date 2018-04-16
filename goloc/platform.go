@@ -1,5 +1,6 @@
 package goloc
 
+// Platform represents an object responsible for specifying a format of the resulting localization file.
 type Platform interface {
 	// Returns platform names that can be used to identify it in the sheet.
 	Names() []string

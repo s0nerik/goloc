@@ -10,7 +10,7 @@ import (
 var (
 	credentials                = kingpin.Flag(`credentials`, `Credentials to access a spreadsheet.`).Short('c').Default(`client_secret.json`).String()
 	platformName               = kingpin.Flag(`platform`, `Target platform name.`).Short('p').Required().String()
-	sheetId                    = kingpin.Flag(`spreadsheet`, `Spreadsheet ID.`).Short('s').Required().String()
+	sheetID                    = kingpin.Flag(`spreadsheet`, `Spreadsheet ID.`).Short('s').Required().String()
 	resDir                     = kingpin.Flag(`resources`, `Path to the resources folder in the project.`).Short('r').Required().String()
 	tabName                    = kingpin.Flag(`tab`, `Localizations tab name.`).Short('t').Required().String()
 	keyColumn                  = kingpin.Flag(`key-column`, `Title of the key column`).Default(`key`).String()
@@ -31,5 +31,5 @@ func main() {
 		log.Fatalf(`Platform "%v" is not supported.`, *platformName)
 	}
 
-	goloc.Run(platform, *resDir, *credentials, *sheetId, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing, *missingLocalizationsReport)
+	goloc.Run(platform, *resDir, *credentials, *sheetID, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing, *missingLocalizationsReport)
 }

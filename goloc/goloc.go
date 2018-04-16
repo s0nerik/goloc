@@ -6,7 +6,6 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
 	"golang.org/x/net/context"
-	"regexp"
 	"sync"
 	"github.com/olekukonko/tablewriter"
 	"os"
@@ -15,44 +14,25 @@ import (
 	"sort"
 )
 
+// Lang represents a language code.
 type Lang = string
+
+// Key represents a localized string key.
 type Key = string
+
+// Localizations represents a mapping between a localized string key and it's values for different languages.
 type Localizations = map[Key]map[Lang]string
 
+// FormatKey represents a name of the format.
 type FormatKey = string
+
+// Formats represents a mapping between format names and platform-specific format descriptions.
 type Formats = map[FormatKey]string
 
+// ResDir represents a resources directory path.
 type ResDir = string
 
-var formatRegexpInitializer sync.Once
-var formatRegexp *regexp.Regexp
-
-var langColumnRegexpInitializer sync.Once
-var langColumnRegexp *regexp.Regexp
-
-func FormatRegexp() *regexp.Regexp {
-	formatRegexpInitializer.Do(func() {
-		r, err := regexp.Compile(`\{([^\{^\}]*)\}`)
-		if err != nil {
-			log.Fatalf("Can't create a regexp for format string. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
-		}
-		formatRegexp = r
-	})
-	return formatRegexp
-}
-
-func LangColumnNameRegexp() *regexp.Regexp {
-	langColumnRegexpInitializer.Do(func() {
-		r, err := regexp.Compile("lang_([a-z]{2})")
-		if err != nil {
-			log.Fatalf("Can't create a regexp for lang column name. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
-		}
-		langColumnRegexp = r
-	})
-	return langColumnRegexp
-}
-
-func sheetsApi(credFilePath string) *sheets.SpreadsheetsService {
+func sheetsAPI(credFilePath string) *sheets.SpreadsheetsService {
 	ctx := context.Background()
 
 	sec, err := ioutil.ReadFile(credFilePath)
@@ -73,8 +53,8 @@ func sheetsApi(credFilePath string) *sheets.SpreadsheetsService {
 	return s.Spreadsheets
 }
 
-func fetchRawValues(api *sheets.SpreadsheetsService, sheetId string, tab string) ([][]interface{}, error) {
-	resp, err := api.Values.Get(sheetId, tab).Do()
+func fetchRawValues(api *sheets.SpreadsheetsService, sheetID string, tab string) ([][]interface{}, error) {
+	resp, err := api.Values.Get(sheetID, tab).Do()
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +63,7 @@ func fetchRawValues(api *sheets.SpreadsheetsService, sheetId string, tab string)
 
 func fetchEverythingRaw(
 	api *sheets.SpreadsheetsService,
-	sheetId string,
+	sheetID string,
 	formatsTab string,
 	localizationsTab string,
 ) (rawFormats, rawLocalizations [][]interface{}, err error) {
@@ -93,11 +73,11 @@ func fetchEverythingRaw(
 	var wg sync.WaitGroup
 	go func() {
 		defer wg.Done()
-		rawFormats, formatsError = fetchRawValues(api, sheetId, formatsTab)
+		rawFormats, formatsError = fetchRawValues(api, sheetID, formatsTab)
 	}()
 	go func() {
 		defer wg.Done()
-		rawLocalizations, localizationsError = fetchRawValues(api, sheetId, localizationsTab)
+		rawLocalizations, localizationsError = fetchRawValues(api, sheetID, localizationsTab)
 	}()
 
 	wg.Add(2)
@@ -113,11 +93,12 @@ func fetchEverythingRaw(
 	return
 }
 
+// Run launches the actual process of fetching, parsing and writing the localization files.
 func Run(
 	platform Platform,
 	resDir string,
 	credFilePath string,
-	sheetId string,
+	sheetID string,
 	tabName string,
 	keyColumn string,
 	formatsTabName string,
@@ -127,11 +108,11 @@ func Run(
 	stopOnMissing bool,
 	reportMissingLocalizations bool,
 ) {
-	api := sheetsApi(credFilePath)
+	api := sheetsAPI(credFilePath)
 
-	rawFormats, rawLocalizations, err := fetchEverythingRaw(api, sheetId, formatsTabName, tabName)
+	rawFormats, rawLocalizations, err := fetchEverythingRaw(api, sheetID, formatsTabName, tabName)
 	if err != nil {
-		log.Fatalf(`Can't fetch data from "%v" sheet. Reason: %v.`, sheetId, err)
+		log.Fatalf(`Can't fetch data from "%v" sheet. Reason: %v.`, sheetID, err)
 	}
 
 	formats, err := ParseFormats(rawFormats, platform, formatsTabName, formatNameColumn)
@@ -146,10 +127,9 @@ func Run(
 		if reportMissingLocalizations {
 			reportMissingLanguages(warn)
 			return
-		} else {
-			for _, w := range warn {
-				log.Println(w)
-			}
+		}
+		for _, w := range warn {
+			log.Println(w)
 		}
 	}
 
