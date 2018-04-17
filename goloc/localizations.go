@@ -1,9 +1,9 @@
 package goloc
 
 import (
+	"github.com/s0nerik/goloc/goloc/re"
 	"log"
 	"strings"
-	"github.com/s0nerik/goloc/goloc/re"
 )
 
 type langColumns = map[int]Lang
@@ -18,7 +18,7 @@ func ParseLocalizations(
 	keyColumn string,
 	errorIfMissing bool,
 ) (loc Localizations, warnings []error, error error) {
-	keyColIndex, langColumns, err := localizationColumnIndices(rawData, tabName, keyColumn)
+	keyColIndex, langCols, err := localizationColumnIndices(rawData, tabName, keyColumn)
 	if err != nil {
 		error = err
 		return
@@ -36,7 +36,7 @@ func ParseLocalizations(
 			continue
 		}
 		key := strings.TrimSpace(row[keyColIndex].(Key))
-		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langColumns, errorIfMissing); err == nil {
+		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langCols, errorIfMissing); err == nil {
 			if len(warn) > 0 {
 				warnings = append(warnings, warn...)
 			}

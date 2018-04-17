@@ -54,10 +54,9 @@ type langColumnsNotFoundError struct {
 }
 
 type localizationMissingError struct {
-	cell     Cell
-	key      Key
-	lang     string
-	platform Platform
+	cell Cell
+	key  Key
+	lang string
 }
 
 type keyMissingError struct {

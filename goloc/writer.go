@@ -1,11 +1,11 @@
 package goloc
 
 import (
-	"os"
 	"bufio"
 	"fmt"
-	"path/filepath"
+	"os"
 	"path"
+	"path/filepath"
 )
 
 // WriteLocalizations writes localization files into platform-defined directories.
@@ -16,9 +16,8 @@ func WriteLocalizations(
 	defLocLang Lang,
 	defLocPath string,
 ) error {
-	// Make sure the the resources dir exists
-	file, err := os.Open(dir)
-	if err != nil {
+	// Make sure we can access resources dir
+	if _, err := os.Stat(dir); err != nil {
 		return err
 	}
 
@@ -41,7 +40,7 @@ func WriteLocalizations(
 				}
 
 				// Create actual localization file
-				file, err = os.Create(filepath.Join(resDir, fileName))
+				file, err := os.Create(filepath.Join(resDir, fileName))
 				// noinspection GoDeferInLoop
 				defer file.Close()
 				if err != nil {
