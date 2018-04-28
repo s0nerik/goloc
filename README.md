@@ -41,4 +41,4 @@ TODO
 
 ## License
 
-TODO
+Released under the [MIT License](https://github.com/s0nerik/goloc/blob/master/LICENSE).
