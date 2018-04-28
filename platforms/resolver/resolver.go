@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"fmt"
+
 	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/platforms/registry"
 	// It's needed to register all available platforms in the registry before running an app.

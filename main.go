@@ -1,10 +1,11 @@
 package main
 
 import (
-	"gopkg.in/alecthomas/kingpin.v2"
+	"log"
+
 	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/platforms/resolver"
-	"log"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (

@@ -3,15 +3,16 @@ package goloc
 import (
 	"io/ioutil"
 	"log"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/sheets/v4"
-	"golang.org/x/net/context"
-	"sync"
-	"github.com/olekukonko/tablewriter"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
-	"sort"
+	"sync"
+
+	"github.com/olekukonko/tablewriter"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/sheets/v4"
 )
 
 // Lang represents a language code.

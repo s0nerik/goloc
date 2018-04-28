@@ -1,11 +1,12 @@
 package platforms
 
 import (
-	"github.com/s0nerik/goloc/goloc"
-	"fmt"
-	"strings"
 	"errors"
+	"fmt"
 	"path/filepath"
+	"strings"
+
+	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/platforms/registry"
 )
 

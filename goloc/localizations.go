@@ -1,9 +1,10 @@
 package goloc
 
 import (
-	"github.com/s0nerik/goloc/goloc/re"
 	"log"
 	"strings"
+
+	"github.com/s0nerik/goloc/goloc/re"
 )
 
 type langColumns = map[int]Lang

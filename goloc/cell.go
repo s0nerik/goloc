@@ -2,6 +2,7 @@ package goloc
 
 import (
 	"fmt"
+
 	"github.com/s0nerik/goloc/utils"
 )
 

@@ -1,9 +1,9 @@
 package re
 
 import (
-	"sync"
-	"regexp"
 	"log"
+	"regexp"
+	"sync"
 )
 
 var formatRegexpInitializer sync.Once
@@ -22,7 +22,6 @@ func FormatRegexp() *regexp.Regexp {
 	})
 	return formatRegexp
 }
-
 
 var langColumnRegexpInitializer sync.Once
 var langColumnRegexp *regexp.Regexp
