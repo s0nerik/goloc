@@ -18,6 +18,64 @@ func localizationsCount(localizations Localizations) map[Lang]int {
 	return result
 }
 
+func newWriter(
+	platform Platform,
+	dir ResDir,
+	lang Lang,
+	defLocLang Lang,
+	defLocPath string,
+) (file *os.File, writer *bufio.Writer, error error) {
+	// Get actual resource file dir and name
+	resDir, fileName, err := localizationFilePath(platform, dir, lang, defLocLang, defLocPath)
+	if err != nil {
+		error = err
+		return
+	}
+
+	// Create all intermediate directories
+	err = os.MkdirAll(resDir, os.ModePerm)
+	if err != nil {
+		error = err
+		return
+	}
+
+	// Create actual localization file
+	file, err = os.Create(filepath.Join(resDir, fileName))
+	if err != nil {
+		error = err
+		return
+	}
+
+	// Create a new writer for the localization file
+	writer = bufio.NewWriter(file)
+
+	return
+}
+
+func writeHeaders(platform Platform, writers map[Lang]*bufio.Writer) error {
+	headerArgs := &HeaderArgs{}
+	for lang, writer := range writers {
+		headerArgs.Lang = lang
+		_, err := writer.WriteString(platform.Header(headerArgs))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func writeFooters(platform Platform, writers map[Lang]*bufio.Writer) error {
+	footerArgs := &FooterArgs{}
+	for lang, writer := range writers {
+		footerArgs.Lang = lang
+		_, err := writer.WriteString(platform.Footer(footerArgs))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WriteLocalizations writes localization files into platform-defined directories.
 func WriteLocalizations(
 	platform Platform,
@@ -25,56 +83,36 @@ func WriteLocalizations(
 	localizations Localizations,
 	defLocLang Lang,
 	defLocPath string,
-) error {
+) (error error) {
 	// Make sure we can access resources dir
-	if _, err := os.Stat(dir); err != nil {
-		return err
+	if _, error = os.Stat(dir); error != nil {
+		return
 	}
-
-	writers := map[Lang]*bufio.Writer{}
 
 	locIndices := map[Lang]int{}
 	locCounts := localizationsCount(localizations)
 	locStringArgs := &LocalizedStringArgs{}
-	headerArgs := &HeaderArgs{}
-	footerArgs := &FooterArgs{}
 
-	// For each localization: create a writer if needed and write each localized string
+	// Prepare writers for each language
+	writers := map[Lang]*bufio.Writer{}
+	for lang := range locCounts {
+		file, writer, err := newWriter(platform, dir, lang, defLocLang, defLocPath)
+		defer file.Close()
+		defer writer.Flush()
+		if err != nil {
+			return err
+		}
+		writers[lang] = writer
+	}
+
+	// Write headers
+	if error = writeHeaders(platform, writers); error != nil {
+		return
+	}
+
+	// Write localization strings
 	for key, keyLoc := range localizations {
 		for lang, value := range keyLoc {
-			if _, ok := writers[lang]; !ok { // Create a new writer and write a header to it if needed
-				// Get actual resource file dir and name
-				resDir, fileName, err := localizationFilePath(platform, dir, lang, defLocLang, defLocPath)
-				if err != nil {
-					return err
-				}
-
-				// Create all intermediate directories
-				err = os.MkdirAll(resDir, os.ModePerm)
-				if err != nil {
-					return err
-				}
-
-				// Create actual localization file
-				file, err := os.Create(filepath.Join(resDir, fileName))
-				// noinspection GoDeferInLoop
-				defer file.Close()
-				if err != nil {
-					return err
-				}
-
-				// Create a new writer for the localization file
-				writer := bufio.NewWriter(file)
-				writers[lang] = writer
-
-				// Write a header
-				headerArgs.Lang = lang
-				_, err = writer.WriteString(platform.Header(headerArgs))
-				if err != nil {
-					return err
-				}
-			}
-
 			writer := writers[lang]
 
 			// Update arguments
@@ -86,29 +124,19 @@ func WriteLocalizations(
 
 			// Write a localized string
 			localizedString := platform.LocalizedString(locStringArgs)
-			_, err := writer.WriteString(localizedString)
-			if err != nil {
-				return err
+			if _, error = writer.WriteString(localizedString); error != nil {
+				return
 			}
 			locIndices[lang]++
 		}
 	}
 
-	// For each writer: write a footer and flush everything
-	for lang, writer := range writers {
-		footerArgs.Lang = lang
-		_, err := writer.WriteString(platform.Footer(footerArgs))
-		if err != nil {
-			return err
-		}
-
-		err = writer.Flush()
-		if err != nil {
-			return err
-		}
+	// Write footers
+	if error = writeFooters(platform, writers); error != nil {
+		return
 	}
 
-	return nil
+	return
 }
 
 func localizationFilePath(platform Platform, dir ResDir, lang Lang, defLocLang Lang, defLocPath string) (resDir string, fileName string, err error) {
