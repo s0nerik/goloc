@@ -29,8 +29,17 @@
 ## Setup
 
 - Download latest release and unpack it into your project's root folder
-- Download `client_secret.json` file from Google Console and put it inside newly created goloc folder. // TODO: explain it in more details
-- Create a script or build task definition that would use the newly unpacked binary with parameters best suited for the project // TODO: explain it better
+- Download `client_secret.json` file from Google API Console and put it inside a newly created `goloc` folder. To do so, follow these steps:
+	- Open [Google API Console](https://console.developers.google.com)
+	- Select a project (or create a new one)
+	- Press `ENABLE APIS AND SERVICES` button
+	- Find `Google Sheets API`
+	- Press `ENABLE`
+	- Go to `Dashboard->Credentials`
+	- Press `Create credentials->Service account key`
+	- Select any type of service account and `JSON` for key type, then press `Create`
+	- Rename the downloaded file to `client_secret.json` and put it into a `goloc` folder of a project
+- Create a script or build task definition with parameters best suited for the project
 
 ## Usage
 
