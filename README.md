@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Features](#features)
-- [Supported platforms](#supported-platforms)
+- [Supported platforms / formats](#supported-platforms-formats)
 - [Setup](#setup)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -20,10 +20,11 @@
 - Customizable format strings
 - Missing localization reports
 
-## Supported platforms
+## Supported platforms / formats
 
 - Android
 - iOS
+- JSON
 
 ## Setup
 
