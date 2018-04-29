@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Features](#features)
-- [Supported platforms / formats](#supported-platforms-formats)
+- [Supported platforms / formats](#supported-platforms--formats)
 - [Setup](#setup)
 - [Usage](#usage)
 - [Contributing](#contributing)
