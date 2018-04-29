@@ -8,7 +8,6 @@
 - [Supported platforms / formats](#supported-platforms--formats)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Features
@@ -39,15 +38,11 @@
 	- Press `Create credentials->Service account key`
 	- Select any type of service account and `JSON` for key type, then press `Create`
 	- Rename the downloaded file to `client_secret.json` and put it into a `goloc` folder of a project
-- Create a script or build task definition with parameters best suited for the project
 
 ## Usage
 
-TODO
-
-## Contributing
-
-TODO
+- Create a script or build task definition with parameters best suited for your project. To see available parameters, run `goloc --help`. `goloc` is distributed in form of separate executables for each platform, so don't forget to take that into account when creating the localization script.
+- Execute the script/task whenever you want to update localized strings. `goloc` will automatically replace any existing localization files with the updates ones.
 
 ## License
 
