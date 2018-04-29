@@ -32,15 +32,15 @@ func (android) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string
 	return filepath.Join("src", "main", "res", targetDir, fileName)
 }
 
-func (android) Header(lang goloc.Lang) string {
+func (android) Header(args *goloc.HeaderArgs) string {
 	return "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<resources>\n"
 }
 
-func (android) Localization(lang goloc.Lang, key goloc.Key, value string) string {
-	return fmt.Sprintf("\t<string name=\"%v\">%v</string>\n", key, value)
+func (android) LocalizedString(args *goloc.LocalizedStringArgs) string {
+	return fmt.Sprintf("\t<string name=\"%v\">%v</string>\n", args.Key, args.Value)
 }
 
-func (android) Footer(lang goloc.Lang) string {
+func (android) Footer(args *goloc.FooterArgs) string {
 	return "</resources>\n"
 }
 
@@ -51,8 +51,8 @@ func (android) ValidateFormat(format string) error {
 	return nil
 }
 
-func (android) IndexedFormatString(index uint, format string) string {
-	return fmt.Sprintf(`%%%v$%v`, index+1, format)
+func (android) FormatString(args *goloc.FormatStringArgs) string {
+	return fmt.Sprintf(`%%%v$%v`, args.Index+1, args.Format)
 }
 
 func (android) ReplacementChars() map[string]string {

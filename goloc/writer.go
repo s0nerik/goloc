@@ -8,6 +8,16 @@ import (
 	"path/filepath"
 )
 
+func localizationsCount(localizations Localizations) map[Lang]int {
+	result := map[Lang]int{}
+	for _, keyLoc := range localizations {
+		for lang := range keyLoc {
+			result[lang]++
+		}
+	}
+	return result
+}
+
 // WriteLocalizations writes localization files into platform-defined directories.
 func WriteLocalizations(
 	platform Platform,
@@ -23,10 +33,16 @@ func WriteLocalizations(
 
 	writers := map[Lang]*bufio.Writer{}
 
+	locIndices := map[Lang]int{}
+	locCounts := localizationsCount(localizations)
+	locStringArgs := &LocalizedStringArgs{}
+	headerArgs := &HeaderArgs{}
+	footerArgs := &FooterArgs{}
+
 	// For each localization: create a writer if needed and write each localized string
 	for key, keyLoc := range localizations {
 		for lang, value := range keyLoc {
-			if writer, ok := writers[lang]; !ok { // Create a new writer and write a header to it if needed
+			if _, ok := writers[lang]; !ok { // Create a new writer and write a header to it if needed
 				// Get actual resource file dir and name
 				resDir, fileName, err := localizationFilePath(platform, dir, lang, defLocLang, defLocPath)
 				if err != nil {
@@ -48,26 +64,40 @@ func WriteLocalizations(
 				}
 
 				// Create a new writer for the localization file
-				writer = bufio.NewWriter(file)
+				writer := bufio.NewWriter(file)
 				writers[lang] = writer
 
 				// Write a header
-				_, err = writer.WriteString(platform.Header(lang))
-				if err != nil {
-					return err
-				}
-			} else { // Use an existing writer to write another localized string
-				_, err := writer.WriteString(platform.Localization(lang, key, value))
+				headerArgs.Lang = lang
+				_, err = writer.WriteString(platform.Header(headerArgs))
 				if err != nil {
 					return err
 				}
 			}
+
+			writer := writers[lang]
+
+			// Update arguments
+			locStringArgs.Index = locIndices[lang]
+			locStringArgs.IsLast = locIndices[lang]+1 >= locCounts[lang]
+			locStringArgs.Key = key
+			locStringArgs.Lang = lang
+			locStringArgs.Value = value
+
+			// Write a localized string
+			localizedString := platform.LocalizedString(locStringArgs)
+			_, err := writer.WriteString(localizedString)
+			if err != nil {
+				return err
+			}
+			locIndices[lang]++
 		}
 	}
 
 	// For each writer: write a footer and flush everything
 	for lang, writer := range writers {
-		_, err := writer.WriteString(platform.Footer(lang))
+		footerArgs.Lang = lang
+		_, err := writer.WriteString(platform.Footer(footerArgs))
 		if err != nil {
 			return err
 		}

@@ -132,23 +132,27 @@ func keyLocalizations(
 }
 
 func withReplacedFormats(platform Platform, str string, formats Formats, tab string, row int, column int) (string, error) {
-	var index uint
+	var index int
 	var err error
+	formatStringArgs := &FormatStringArgs{}
 	strWithReplacedFormats := re.FormatRegexp().ReplaceAllStringFunc(str, func(formatName string) string {
+		defer func() { index++ }()
 		if len(formatName) < 2 {
 			log.Fatalf(`%v: something went wrong. Please submit an issue with the values in the problematic row.`, Cell{tab, uint(row), uint(column)})
 		}
 
 		name := formatName[1 : len(formatName)-1]
-		if format, ok := formats[name]; ok {
-			return platform.IndexedFormatString(index, format)
-		}
-		if err == nil {
-			err = &formatNotFoundError{Cell{tab, uint(row), uint(column)}, name}
+		// Check if format specification exist and report an error if not
+		if _, ok := formats[name]; !ok {
+			if err == nil {
+				err = &formatNotFoundError{Cell{tab, uint(row), uint(column)}, name}
+			}
+			return ""
 		}
 
-		index++
-		return str
+		formatStringArgs.Index = index
+		formatStringArgs.Format = formats[name]
+		return platform.FormatString(formatStringArgs)
 	})
 
 	return strWithReplacedFormats, err

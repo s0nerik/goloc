@@ -32,15 +32,15 @@ func (ios) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
 	return filepath.Join("Resources", "Localization", targetDir, fileName)
 }
 
-func (ios) Header(lang goloc.Lang) string {
+func (ios) Header(args *goloc.HeaderArgs) string {
 	return ""
 }
 
-func (ios) Localization(lang goloc.Lang, key goloc.Key, value string) string {
-	return fmt.Sprintf("\"%v\" = \"%v\";\n", key, value)
+func (ios) LocalizedString(args *goloc.LocalizedStringArgs) string {
+	return fmt.Sprintf("\"%v\" = \"%v\";\n", args.Key, args.Value)
 }
 
-func (ios) Footer(lang goloc.Lang) string {
+func (ios) Footer(args *goloc.FooterArgs) string {
 	return ""
 }
 
@@ -51,8 +51,8 @@ func (ios) ValidateFormat(format string) error {
 	return nil
 }
 
-func (ios) IndexedFormatString(index uint, format string) string {
-	return fmt.Sprintf(`%%%v`, format)
+func (ios) FormatString(args *goloc.FormatStringArgs) string {
+	return fmt.Sprintf(`%%%v`, args.Format)
 }
 
 func (ios) ReplacementChars() map[string]string {

@@ -18,19 +18,19 @@ func (p *mockPlatform) LocalizationFilePath(lang Lang, resDir ResDir) string {
 	return args.String(0)
 }
 
-func (p *mockPlatform) Header(lang Lang) string {
-	args := p.Called(lang)
-	return args.String(0)
+func (p *mockPlatform) Header(args *HeaderArgs) string {
+	ret := p.Called(args)
+	return ret.String(0)
 }
 
-func (p *mockPlatform) Localization(lang Lang, key Key, value string) string {
-	args := p.Called(lang, key, value)
-	return args.String(0)
+func (p *mockPlatform) LocalizedString(args *LocalizedStringArgs) string {
+	ret := p.Called(args)
+	return ret.String(0)
 }
 
-func (p *mockPlatform) Footer(lang Lang) string {
-	args := p.Called(lang)
-	return args.String(0)
+func (p *mockPlatform) Footer(args *FooterArgs) string {
+	ret := p.Called(args)
+	return ret.String(0)
 }
 
 func (p *mockPlatform) ValidateFormat(format string) error {
@@ -38,9 +38,9 @@ func (p *mockPlatform) ValidateFormat(format string) error {
 	return args.Error(0)
 }
 
-func (p *mockPlatform) IndexedFormatString(index uint, format string) string {
-	args := p.Called(index, format)
-	return args.String(0)
+func (p *mockPlatform) FormatString(args *FormatStringArgs) string {
+	ret := p.Called(args)
+	return ret.String(0)
 }
 
 func (p *mockPlatform) ReplacementChars() map[string]string {
@@ -55,11 +55,11 @@ func newMockPlatform(customMocksProvider func(p *mockPlatform)) *mockPlatform {
 	}
 	p.On("Names").Return([]string{"mock"})
 	p.On("LocalizationFilePath", mock.AnythingOfType("Lang"), mock.AnythingOfType("ResDir")).Return("")
-	p.On("Header", mock.AnythingOfType("Lang")).Return("")
-	p.On("Localization", mock.AnythingOfType("Lang"), mock.AnythingOfType("Key"), mock.AnythingOfType("string")).Return("")
-	p.On("Footer", mock.AnythingOfType("Lang")).Return("")
+	p.On("Header", mock.AnythingOfType("*goloc.HeaderArgs")).Return("")
+	p.On("LocalizedString", mock.AnythingOfType("*goloc.LocalizedStringArgs")).Return("")
+	p.On("Footer", mock.AnythingOfType("*goloc.FooterArgs")).Return("")
 	p.On("ValidateFormat", mock.AnythingOfType("string")).Return(nil)
-	p.On("IndexedFormatString", mock.AnythingOfType("uint"), mock.AnythingOfType("string")).Return("")
+	p.On("FormatString", mock.AnythingOfType("*goloc.FormatStringArgs")).Return("")
 	p.On("ReplacementChars").Return(map[string]string{
 		`~`: `tilde`,
 	})
