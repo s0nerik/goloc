@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Features](#features)
-- [Supported OS / architecutres](#supported-os--architecutres)
+- [Supported OS / architectures](#supported-os--architectures)
 - [Supported platforms / formats](#supported-platforms--formats)
 - [Setup](#setup)
 - [Usage](#usage)
@@ -20,7 +20,7 @@
 - Customizable format strings
 - Missing localization reports
 
-## Supported OS / architecutres
+## Supported OS / architectures
 
 **goloc** can be built for each OS/architecture supported by golang, but release archives
 contain binaries only for **amd64** architecture for **macOS**, **Linux** and **Windows**.
