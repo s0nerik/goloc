@@ -2,6 +2,7 @@ package goloc
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"path"
@@ -52,27 +53,61 @@ func newWriter(
 	return
 }
 
-func writeHeaders(platform Platform, writers map[Lang]*bufio.Writer) error {
+func writeHeaders(platform Platform, buffers map[Lang]*bytes.Buffer) error {
 	headerArgs := &HeaderArgs{}
-	for lang, writer := range writers {
+	for lang, buf := range buffers {
 		headerArgs.Lang = lang
-		_, err := writer.WriteString(platform.Header(headerArgs))
-		if err != nil {
+		if _, err := buf.WriteString(platform.Header(headerArgs)); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func writeFooters(platform Platform, writers map[Lang]*bufio.Writer) error {
+func writeFooters(platform Platform, buffers map[Lang]*bytes.Buffer) error {
 	footerArgs := &FooterArgs{}
-	for lang, writer := range writers {
+	for lang, buf := range buffers {
 		footerArgs.Lang = lang
-		_, err := writer.WriteString(platform.Footer(footerArgs))
-		if err != nil {
+		if _, err := buf.WriteString(platform.Footer(footerArgs)); err != nil {
 			return err
 		}
 	}
+	return nil
+}
+
+func writeBuffers(
+	platform Platform,
+	dir ResDir,
+	localizations Localizations,
+	defLocLang Lang,
+	defLocPath string,
+	buffers map[Lang]*bytes.Buffer,
+) error {
+	ch := make(chan error, len(buffers))
+	for lang, buf := range buffers {
+		go func(lang Lang, buf *bytes.Buffer) {
+			file, writer, err := newWriter(platform, dir, lang, defLocLang, defLocPath)
+			if err != nil {
+				ch <- err
+				return
+			}
+			defer file.Close()
+			defer writer.Flush()
+
+			if _, err = writer.WriteString(buf.String()); err != nil {
+				ch <- err
+				return
+			}
+			ch <- nil
+		}(lang, buf)
+	}
+
+	for _ = range buffers {
+		if err := <-ch; err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -93,27 +128,21 @@ func WriteLocalizations(
 	locCounts := localizationsCount(localizations)
 	locStringArgs := &LocalizedStringArgs{}
 
-	// Prepare writers for each language
-	writers := map[Lang]*bufio.Writer{}
+	// Prepare string buffers for each language
+	buffers := map[Lang]*bytes.Buffer{}
 	for lang := range locCounts {
-		file, writer, err := newWriter(platform, dir, lang, defLocLang, defLocPath)
-		defer file.Close()
-		defer writer.Flush()
-		if err != nil {
-			return err
-		}
-		writers[lang] = writer
+		buffers[lang] = bytes.NewBufferString("")
 	}
 
 	// Write headers
-	if error = writeHeaders(platform, writers); error != nil {
+	if error = writeHeaders(platform, buffers); error != nil {
 		return
 	}
 
 	// Write localization strings
 	for key, keyLoc := range localizations {
 		for lang, value := range keyLoc {
-			writer := writers[lang]
+			buf := buffers[lang]
 
 			// Update arguments
 			locStringArgs.Index = locIndices[lang]
@@ -124,7 +153,7 @@ func WriteLocalizations(
 
 			// Write a localized string
 			localizedString := platform.LocalizedString(locStringArgs)
-			if _, error = writer.WriteString(localizedString); error != nil {
+			if _, error = buf.WriteString(localizedString); error != nil {
 				return
 			}
 			locIndices[lang]++
@@ -132,11 +161,16 @@ func WriteLocalizations(
 	}
 
 	// Write footers
-	if error = writeFooters(platform, writers); error != nil {
+	if error = writeFooters(platform, buffers); error != nil {
 		return
 	}
 
-	return
+	// Write all buffers to files
+	if error = writeBuffers(platform, dir, localizations, defLocLang, defLocPath, buffers); error != nil {
+		return
+	}
+
+	return nil
 }
 
 func localizationFilePath(platform Platform, dir ResDir, lang Lang, defLocLang Lang, defLocPath string) (resDir string, fileName string, err error) {
