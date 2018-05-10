@@ -11,6 +11,7 @@ func ParseFormats(
 	platform Platform,
 	formatsTabName string,
 	formatColumnTitle string,
+	defFormatName string,
 ) (Formats, error) {
 	formatColIndex, platformColIndex, actualPlatformName, err := columnIndices(platform, rawData, formatsTabName, formatColumnTitle)
 	if err != nil {
@@ -60,6 +61,11 @@ func ParseFormats(
 				cell: *NewCell(formatsTabName, actualRowIndex, uint(formatColIndex)),
 			}
 		}
+	}
+
+	// Handle default format ("{}")
+	if defFormatName != "" {
+		formats[""] = defFormatName
 	}
 
 	return formats, nil

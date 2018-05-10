@@ -108,6 +108,7 @@ func Run(
 	defaultLocalizationPath string,
 	stopOnMissing bool,
 	reportMissingLocalizations bool,
+	defFormatName string,
 ) {
 	api := sheetsAPI(credFilePath)
 
@@ -116,7 +117,9 @@ func Run(
 		log.Fatalf(`Can't fetch data from "%v" sheet. Reason: %v.`, sheetID, err)
 	}
 
-	formats, err := ParseFormats(rawFormats, platform, formatsTabName, formatNameColumn)
+	log.Println(rawLocalizations)
+
+	formats, err := ParseFormats(rawFormats, platform, formatsTabName, formatNameColumn, defFormatName)
 	if err != nil {
 		log.Fatal(err)
 	}
