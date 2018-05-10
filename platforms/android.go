@@ -1,7 +1,6 @@
 package platforms
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -45,14 +44,11 @@ func (android) Footer(args *goloc.FooterArgs) string {
 }
 
 func (android) ValidateFormat(format string) error {
-	if strings.HasPrefix(format, `%`) {
-		return errors.New(`format must not start with "%" - it will be added automatically`)
-	}
 	return nil
 }
 
 func (android) FormatString(args *goloc.FormatStringArgs) string {
-	return fmt.Sprintf(`%%%v$%v`, args.Index+1, args.Format)
+	return fmt.Sprintf(`%%%v$%v`, args.Index+1, strings.TrimPrefix(args.Format, `%`))
 }
 
 func (android) ReplacementChars() map[string]string {
