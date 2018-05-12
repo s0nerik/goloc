@@ -33,7 +33,7 @@ contain binaries only for **amd64** architecture for **macOS**, **Linux** and **
 
 ## Setup
 
-- Download latest release and unpack it into your project's root folder
+- Download [latest release](https://github.com/s0nerik/goloc/releases/download/0.9/goloc.zip) and unpack it into your project's root folder
 - Download `client_secret.json` file from Google API Console and put it inside a newly created `goloc` folder. To do so, follow these steps:
 	- Open [Google API Console](https://console.developers.google.com)
 	- Select a project (or create a new one)
