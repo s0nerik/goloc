@@ -1,3 +1,5 @@
+![Logo](docs/images/goloc.png?raw=true)
+
 # goloc
 
 > A flexible tool for application localization using Google Sheets.
