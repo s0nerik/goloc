@@ -117,8 +117,6 @@ func Run(
 		log.Fatalf(`Can't fetch data from "%v" sheet. Reason: %v.`, sheetID, err)
 	}
 
-	log.Println(rawLocalizations)
-
 	formats, err := ParseFormats(rawFormats, platform, formatsTabName, formatNameColumn, defFormatName)
 	if err != nil {
 		log.Fatal(err)
