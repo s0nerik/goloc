@@ -56,5 +56,9 @@ func (ios) FormatString(args *goloc.FormatStringArgs) string {
 }
 
 func (ios) ReplacementChars() map[string]string {
-	return nil
+	return map[string]string {
+		`'`:  `\'`,
+		`"`:  `\"`,
+		"\n": `\n`,
+	}
 }
