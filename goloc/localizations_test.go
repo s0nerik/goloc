@@ -15,7 +15,7 @@ func formats() Formats {
 	}
 
 	platform := newMockPlatform(nil)
-	formats, _ := ParseFormats(data, platform, "", "format")
+	formats, _ := ParseFormats(data, platform, "", "format", "{}")
 	return formats
 }
 

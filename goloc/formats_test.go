@@ -10,7 +10,7 @@ func TestFormatsEmptyData(t *testing.T) {
 	var data [][]interface{}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "")
+	_, err := ParseFormats(data, platform, "", "", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &emptySheetError{}, err)
 	}
@@ -23,7 +23,7 @@ func TestFormatsEmptyFirstRow(t *testing.T) {
 	}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "")
+	_, err := ParseFormats(data, platform, "", "", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &firstRowNotFoundError{}, err)
 	}
@@ -35,7 +35,7 @@ func TestFormatsMissingFormatColumn(t *testing.T) {
 	}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &noFormatColumnError{}, err)
 	}
@@ -47,7 +47,7 @@ func TestFormatsMissingPlatformColumn(t *testing.T) {
 	}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &noPlatformColumnError{}, err)
 	}
@@ -60,7 +60,7 @@ func TestFormatsMissingFormatKey(t *testing.T) {
 	}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &formatKeyNotSpecifiedError{}, err)
 	}
@@ -73,7 +73,7 @@ func TestFormatsMissingFormatValue1(t *testing.T) {
 	}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &formatValueNotSpecifiedError{}, err)
 	}
@@ -86,7 +86,7 @@ func TestFormatsMissingFormatValue2(t *testing.T) {
 	}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &formatValueNotSpecifiedError{}, err)
 	}
@@ -99,7 +99,7 @@ func TestFormatsMissingFormatValue3(t *testing.T) {
 	}
 
 	platform := newMockPlatform(nil)
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &formatValueNotSpecifiedError{}, err)
 	}
@@ -118,7 +118,7 @@ func TestFormatsFormatValidation(t *testing.T) {
 		p.On("ValidateFormat", "%s").Return(&formatValueInvalidError{})
 	})
 
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &formatValueInvalidError{}, err)
 	}
@@ -138,7 +138,7 @@ func TestFormatsWrongValueType(t *testing.T) {
 
 	platform := newMockPlatform(nil)
 
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &wrongValueTypeError{}, err)
 	}
@@ -158,7 +158,7 @@ func TestFormatsWrongKeyType(t *testing.T) {
 
 	platform := newMockPlatform(nil)
 
-	_, err := ParseFormats(data, platform, "", "format")
+	_, err := ParseFormats(data, platform, "", "format", "{}")
 	if assert.Error(t, err) {
 		assert.IsType(t, &wrongKeyTypeError{}, err)
 	}
