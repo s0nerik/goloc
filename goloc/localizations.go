@@ -2,12 +2,15 @@ package goloc
 
 import (
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/s0nerik/goloc/goloc/re"
 )
 
 type langColumns = map[int]Lang
+
+var DefaultEmptyLocRegexp, _ = regexp.Compile("^$")
 
 // ParseLocalizations parses formats given the raw table data and returns, if successful, mappings
 // for each localized string in different languages.
@@ -18,7 +21,12 @@ func ParseLocalizations(
 	tabName string,
 	keyColumn string,
 	errorIfMissing bool,
+	emptyLocalizationRegexp *regexp.Regexp,
 ) (loc Localizations, warnings []error, error error) {
+	if (emptyLocalizationRegexp == nil) {
+		emptyLocalizationRegexp = DefaultEmptyLocRegexp
+	}
+
 	keyColIndex, langCols, err := localizationColumnIndices(rawData, tabName, keyColumn)
 	if err != nil {
 		error = err
@@ -37,7 +45,7 @@ func ParseLocalizations(
 			continue
 		}
 		key := strings.TrimSpace(row[keyColIndex].(Key))
-		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langCols, errorIfMissing); err == nil {
+		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langCols, errorIfMissing, emptyLocalizationRegexp); err == nil {
 			if len(warn) > 0 {
 				warnings = append(warnings, warn...)
 			}
@@ -102,12 +110,13 @@ func keyLocalizations(
 	key Key,
 	langColumns langColumns,
 	errorIfMissing bool,
+	emptyLocalizationRegexp *regexp.Regexp,
 ) (keyLoc map[Key]string, warnings []error, error error) {
 	keyLoc = map[Key]string{}
 	for i, lang := range langColumns {
 		if i < len(row) {
 			val := strings.TrimSpace(row[i].(string))
-			if len(val) > 0 {
+			if match := emptyLocalizationRegexp.MatchString(val); !match {
 				valWithoutSpecChars := withReplacedSpecialChars(platform, val)
 				finalValue, err := withReplacedFormats(platform, valWithoutSpecChars, formats, tab, line, i)
 				if err != nil {
