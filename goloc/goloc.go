@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -109,6 +110,7 @@ func Run(
 	stopOnMissing bool,
 	reportMissingLocalizations bool,
 	defFormatName string,
+	emptyLocalizationMatch *regexp.Regexp,
 ) {
 	api := sheetsAPI(credFilePath)
 
@@ -122,7 +124,7 @@ func Run(
 		log.Fatal(err)
 	}
 
-	localizations, warn, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing)
+	localizations, warn, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing, emptyLocalizationMatch)
 	if err != nil {
 		log.Fatal(err)
 	} else {
