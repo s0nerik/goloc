@@ -110,7 +110,9 @@ func keyLocalizations(
 	for i, lang := range langColumns {
 		if i < len(row) {
 			val := strings.TrimSpace(row[i].(string))
-			if match, _ := regexp.MatchString(emptyLocalizationMatch, val); !match {
+			match := false
+			match, error = regexp.MatchString(emptyLocalizationMatch, val)
+			if !match {
 				valWithoutSpecChars := withReplacedSpecialChars(platform, val)
 				finalValue, err := withReplacedFormats(platform, valWithoutSpecChars, formats, tab, line, i)
 				if err != nil {
