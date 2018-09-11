@@ -2,6 +2,7 @@ package goloc
 
 import (
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/s0nerik/goloc/goloc/re"
@@ -18,6 +19,7 @@ func ParseLocalizations(
 	tabName string,
 	keyColumn string,
 	errorIfMissing bool,
+	emptyLocalizationMatch string,
 ) (loc Localizations, warnings []error, error error) {
 	keyColIndex, langCols, err := localizationColumnIndices(rawData, tabName, keyColumn)
 	if err != nil {
@@ -37,7 +39,7 @@ func ParseLocalizations(
 			continue
 		}
 		key := strings.TrimSpace(row[keyColIndex].(Key))
-		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langCols, errorIfMissing); err == nil {
+		if keyLoc, warn, err := keyLocalizations(platform, formats, tabName, actualRow, row, key, langCols, errorIfMissing, emptyLocalizationMatch); err == nil {
 			if len(warn) > 0 {
 				warnings = append(warnings, warn...)
 			}
@@ -102,12 +104,13 @@ func keyLocalizations(
 	key Key,
 	langColumns langColumns,
 	errorIfMissing bool,
+	emptyLocalizationMatch string,
 ) (keyLoc map[Key]string, warnings []error, error error) {
 	keyLoc = map[Key]string{}
 	for i, lang := range langColumns {
 		if i < len(row) {
 			val := strings.TrimSpace(row[i].(string))
-			if len(val) > 0 {
+			if match, _ := regexp.MatchString(emptyLocalizationMatch, val); !match {
 				valWithoutSpecChars := withReplacedSpecialChars(platform, val)
 				finalValue, err := withReplacedFormats(platform, valWithoutSpecChars, formats, tab, line, i)
 				if err != nil {

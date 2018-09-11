@@ -22,6 +22,7 @@ var (
 	defLoc                     = kingpin.Flag(`default-localization`, `Default localization language (e.g. "en"). Specifying this doesn't have any effect if the "--default-localization-file-path" is not specified.`).Default(`en`).String()
 	defLocPath                 = kingpin.Flag(`default-localization-file-path`, `Full path to the default localization file. Specify this if you want to write a default localization into a specific file (ignoring the localization path generation logic for a language specified in "--default-localization").`).String()
 	missingLocalizationsReport = kingpin.Flag(`missing-localizations-report`, `Specify this flag if you want to only pretty-print missing localizations without generating the actual localization files.`).Default(`false`).Bool()
+	emptyLocalizationMatch     = kingpin.Flag(`empty-localization-match`, `Regex for empty localization string.`).Default(`(^$)`).String()
 )
 
 func main() {
@@ -33,5 +34,5 @@ func main() {
 		log.Fatalf(`Platform "%v" is not supported.`, *platformName)
 	}
 
-	goloc.Run(platform, *resDir, *credentials, *sheetID, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing, *missingLocalizationsReport, *defFormatName)
+	goloc.Run(platform, *resDir, *credentials, *sheetID, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing, *missingLocalizationsReport, *defFormatName, *emptyLocalizationMatch)
 }
