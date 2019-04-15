@@ -1,11 +1,10 @@
 package main
 
 import (
-	"log"
-
 	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/platforms/resolver"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"log"
 )
 
 var (
@@ -26,7 +25,7 @@ var (
 )
 
 func main() {
-	kingpin.Version("0.9.2")
+	kingpin.Version("0.9.3")
 	kingpin.Parse()
 
 	platform, err := resolver.FindPlatform(*platformName)
