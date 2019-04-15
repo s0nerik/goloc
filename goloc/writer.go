@@ -117,7 +117,7 @@ func WriteLocalizations(
 	}
 
 	locIndices := map[Lang]int{}
-	locCounts := localizations.Counts()
+	locCounts := localizations.Count()
 	locStringArgs := &LocalizedStringArgs{}
 
 	// Prepare string buffers for each language
