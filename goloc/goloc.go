@@ -26,7 +26,7 @@ type Key = string
 type Localizations map[Key]map[Lang]string
 
 // LocalizationFormatArgs represents a mapping between a localized string key and its format arguments.
-type LocalizationFormatArgs map[Key][]string
+type LocalizationFormatArgs map[Key][]FormatKey
 
 // FormatKey represents a name of the format.
 type FormatKey = string
