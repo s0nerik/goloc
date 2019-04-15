@@ -1,5 +1,7 @@
 package goloc
 
+import "time"
+
 // LocalizedStringArgs encapsulates arguments to a function that returns the actual localized string for a given platform.
 type LocalizedStringArgs struct {
 	Index  int
@@ -18,6 +20,7 @@ type FormatStringArgs struct {
 // HeaderArgs encapsulates arguments to a function that returns a localization file header for a given platform.
 type HeaderArgs struct {
 	Lang Lang
+	Time time.Time
 }
 
 // FooterArgs encapsulates arguments to a function that returns a localization file footer for a given platform.

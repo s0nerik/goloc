@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 func localizationsCount(localizations Localizations) map[Lang]int {
@@ -53,10 +54,11 @@ func newWriter(
 	return
 }
 
-func writeHeaders(platform Platform, buffers map[Lang]*bytes.Buffer) error {
+func writeHeaders(platform Platform, buffers map[Lang]*bytes.Buffer, t time.Time) error {
 	headerArgs := &HeaderArgs{}
 	for lang, buf := range buffers {
 		headerArgs.Lang = lang
+		headerArgs.Time = t
 		if _, err := buf.WriteString(platform.Header(headerArgs)); err != nil {
 			return err
 		}
@@ -135,7 +137,7 @@ func WriteLocalizations(
 	}
 
 	// Write headers
-	if error = writeHeaders(platform, buffers); error != nil {
+	if error = writeHeaders(platform, buffers, time.Now()); error != nil {
 		return
 	}
 
