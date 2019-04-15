@@ -141,7 +141,7 @@ func Run(
 	}
 
 	if p, ok := platform.(Preprocessor); ok {
-		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
+		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -153,7 +153,7 @@ func Run(
 	}
 
 	if p, ok := platform.(Postprocessor); ok {
-		err := p.Postprocess(PostprocessArgs{ResDir: resDir, Localizations: localizations, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
+		err := p.Postprocess(PostprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
 		if err != nil {
 			log.Fatal(err)
 		}
