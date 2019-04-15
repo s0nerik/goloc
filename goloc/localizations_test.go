@@ -22,7 +22,8 @@ func formats() Formats {
 
 func parseTestLocalizations(data [][]interface{}, errorIfMissing bool, missingRegexp *regexp.Regexp) (loc Localizations, warnings []error, error error) {
 	p := newMockPlatform(nil)
-	return ParseLocalizations(data, p, formats(), "", "key", errorIfMissing, missingRegexp)
+	loc, _, warnings, error = ParseLocalizations(data, p, formats(), "", "key", errorIfMissing, missingRegexp)
+	return
 }
 
 func TestLocalizationsEmptyData(t *testing.T) {

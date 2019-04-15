@@ -2,6 +2,7 @@ package goloc
 
 import (
 	"log"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -22,7 +23,9 @@ func ParseLocalizations(
 	keyColumn string,
 	errorIfMissing bool,
 	emptyLocalizationRegexp *regexp.Regexp,
-) (loc Localizations, warnings []error, error error) {
+) (loc Localizations, formatArgs LocalizationFormatArgs, warnings []error, error error) {
+	formatArgs = LocalizationFormatArgs{}
+
 	if (emptyLocalizationRegexp == nil) {
 		emptyLocalizationRegexp = DefaultEmptyLocRegexp
 	}
@@ -52,6 +55,11 @@ func ParseLocalizations(
 			loc[key] = keyLoc
 		} else {
 			error = err
+			return
+		}
+
+		formatArgs[key], error = keyFormatArgs(platform, tabName, actualRow, row, key, langCols, emptyLocalizationRegexp)
+		if error != nil {
 			return
 		}
 	}
@@ -96,6 +104,50 @@ func localizationColumnIndices(
 	if len(langCols) == 0 {
 		err = &langColumnsNotFoundError{Cell{tabName, uint(1), uint(0)}}
 		return
+	}
+
+	return
+}
+
+func keyFormatArgs(
+	platform Platform,
+	tab string,
+	line int,
+	row []interface{},
+	key Key,
+	langColumns langColumns,
+	emptyLocalizationRegexp *regexp.Regexp,
+) (formatArgs []string, err error) {
+	langFormatArgs := map[int][]string{}
+
+	for i := range langColumns {
+		if i < len(row) {
+			val := strings.TrimSpace(row[i].(string))
+			valWithoutSpecChars := withReplacedSpecialChars(platform, val)
+			if !emptyLocalizationRegexp.MatchString(valWithoutSpecChars) {
+				langFormatArgs[i] = FormatArgs(valWithoutSpecChars)
+			}
+		}
+	}
+
+	if len(langFormatArgs) > 1 {
+		first := true
+		var prevArgs []string
+		for col, fArgs := range langFormatArgs {
+			if !first && !reflect.DeepEqual(fArgs, prevArgs) {
+				err = newFormatArgsDifferentError(tab, line, col, key, langColumns[col])
+				return
+			}
+			prevArgs = fArgs
+			first = false
+		}
+	}
+
+	if len(langFormatArgs) > 0 {
+		for _, v := range langFormatArgs {
+			formatArgs = v
+			break
+		}
 	}
 
 	return
@@ -187,4 +239,19 @@ func (loc Localizations) Count() map[Lang]int {
 		}
 	}
 	return result
+}
+
+func (loc Localizations) Locales() (locales []string) {
+	langs := map[Lang]bool{}
+	for _, v := range loc {
+		for lang := range v {
+			langs[lang] = true
+		}
+	}
+
+	for k := range langs {
+		locales = append(locales, k)
+	}
+
+	return locales
 }

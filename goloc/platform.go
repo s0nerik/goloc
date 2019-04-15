@@ -4,11 +4,12 @@ import "time"
 
 // LocalizedStringArgs encapsulates arguments to a function that returns the actual localized string for a given platform.
 type LocalizedStringArgs struct {
-	Index  int
-	IsLast bool
-	Lang   Lang
-	Key    Key
-	Value  string
+	Index      int
+	IsLast     bool
+	Lang       Lang
+	Key        Key
+	Value      string
+	FormatArgs []string
 }
 
 // FormatStringArgs encapsulates arguments to a function that returns the actual format specification for a given platform.

@@ -108,6 +108,7 @@ func WriteLocalizations(
 	platform Platform,
 	dir ResDir,
 	localizations Localizations,
+	formatArgs LocalizationFormatArgs,
 	defLocLang Lang,
 	defLocPath string,
 ) (error error) {
@@ -142,6 +143,7 @@ func WriteLocalizations(
 			locStringArgs.Key = key
 			locStringArgs.Lang = lang
 			locStringArgs.Value = value
+			locStringArgs.FormatArgs = formatArgs[key]
 
 			// Write a localized string
 			localizedString := platform.LocalizedString(locStringArgs)

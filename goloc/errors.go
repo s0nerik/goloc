@@ -36,6 +36,12 @@ type formatValueInvalidError struct {
 	reason       error
 }
 
+type formatArgsDifferentError struct {
+	cell Cell
+	key  Key
+	lang string
+}
+
 type wrongValueTypeError struct {
 	cell Cell
 }
@@ -66,6 +72,14 @@ type keyMissingError struct {
 type formatNotFoundError struct {
 	cell       Cell
 	formatName string
+}
+
+func newFormatArgsDifferentError(tab string, row int, col int, key Key, lang string) *formatArgsDifferentError {
+	return &formatArgsDifferentError{
+		cell: *NewCell(tab, uint(row), uint(col)),
+		key:  key,
+		lang: lang,
+	}
 }
 
 func newLocalizationMissingError(tab string, row int, col int, key Key, lang string) *localizationMissingError {
@@ -108,6 +122,10 @@ func (e *formatValueNotSpecifiedError) Error() string {
 
 func (e *formatValueInvalidError) Error() string {
 	return fmt.Sprintf(`%v: format "%v" is invalid for platform "%v" (%v)`, e.cell, e.formatValue, e.platformName, e.reason)
+}
+
+func (e *formatArgsDifferentError) Error() string {
+	return fmt.Sprintf(`%v: format arguments must be the same for each language`, e.cell)
 }
 
 func (e *wrongValueTypeError) Error() string {
