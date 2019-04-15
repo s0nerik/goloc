@@ -116,6 +116,12 @@ func columnIndices(
 	return
 }
 
-func FormatArgs(str string) []string {
-	return re.FormatRegexp().FindAllString(str, -1)
+func FormatArgs(str string) (args []FormatKey) {
+	matches := re.FormatRegexp().FindAllStringSubmatch(str, -1)
+
+	for _, m := range matches {
+		args = append(args, m[1])
+	}
+
+	return args
 }
