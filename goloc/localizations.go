@@ -111,8 +111,8 @@ func keyLocalizations(
 	langColumns langColumns,
 	errorIfMissing bool,
 	emptyLocalizationRegexp *regexp.Regexp,
-) (keyLoc map[Key]string, warnings []error, error error) {
-	keyLoc = map[Key]string{}
+) (keyLoc map[Lang]string, warnings []error, error error) {
+	keyLoc = map[Lang]string{}
 	for i, lang := range langColumns {
 		if i < len(row) {
 			val := strings.TrimSpace(row[i].(string))
