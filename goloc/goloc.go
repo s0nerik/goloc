@@ -23,7 +23,7 @@ type Lang = string
 type Key = string
 
 // Localizations represents a mapping between a localized string key and it's values for different languages.
-type Localizations = map[Key]map[Lang]string
+type Localizations map[Key]map[Lang]string
 
 // FormatKey represents a name of the format.
 type FormatKey = string

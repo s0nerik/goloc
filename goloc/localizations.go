@@ -178,3 +178,13 @@ func withReplacedSpecialChars(platform Platform, str string) string {
 
 	return strings.NewReplacer(replacements...).Replace(str)
 }
+
+func (loc Localizations) Counts() map[Lang]int {
+	result := map[Lang]int{}
+	for _, keyLoc := range loc {
+		for lang := range keyLoc {
+			result[lang]++
+		}
+	}
+	return result
+}

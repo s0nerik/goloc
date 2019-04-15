@@ -10,16 +10,6 @@ import (
 	"time"
 )
 
-func localizationsCount(localizations Localizations) map[Lang]int {
-	result := map[Lang]int{}
-	for _, keyLoc := range localizations {
-		for lang := range keyLoc {
-			result[lang]++
-		}
-	}
-	return result
-}
-
 func newWriter(
 	platform Platform,
 	dir ResDir,
@@ -127,7 +117,7 @@ func WriteLocalizations(
 	}
 
 	locIndices := map[Lang]int{}
-	locCounts := localizationsCount(localizations)
+	locCounts := localizations.Counts()
 	locStringArgs := &LocalizedStringArgs{}
 
 	// Prepare string buffers for each language
