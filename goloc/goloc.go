@@ -137,9 +137,23 @@ func Run(
 		}
 	}
 
+	if p, ok := platform.(Preprocessor); ok {
+		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations})
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	err = WriteLocalizations(platform, resDir, localizations, defaultLocalization, defaultLocalizationPath)
 	if err != nil {
 		log.Fatalf(`Can't write localizations. Reason: %v.`, err)
+	}
+
+	if p, ok := platform.(Postprocessor); ok {
+		err := p.Postprocess(PostprocessArgs{ResDir: resDir, Localizations: localizations})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
