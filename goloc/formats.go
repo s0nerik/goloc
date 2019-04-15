@@ -1,6 +1,7 @@
 package goloc
 
 import (
+	"github.com/s0nerik/goloc/goloc/re"
 	"strings"
 )
 
@@ -113,4 +114,8 @@ func columnIndices(
 	}
 
 	return
+}
+
+func FormatArgs(str string) []string {
+	return re.FormatRegexp().FindAllString(str, -1)
 }
