@@ -1,6 +1,7 @@
 package goloc
 
 import (
+	"github.com/s0nerik/goloc/goloc/re"
 	"strings"
 )
 
@@ -113,4 +114,14 @@ func columnIndices(
 	}
 
 	return
+}
+
+func FormatArgs(str string) (args []FormatKey) {
+	matches := re.FormatRegexp().FindAllStringSubmatch(str, -1)
+
+	for _, m := range matches {
+		args = append(args, m[1])
+	}
+
+	return args
 }

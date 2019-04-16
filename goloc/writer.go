@@ -7,17 +7,8 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 )
-
-func localizationsCount(localizations Localizations) map[Lang]int {
-	result := map[Lang]int{}
-	for _, keyLoc := range localizations {
-		for lang := range keyLoc {
-			result[lang]++
-		}
-	}
-	return result
-}
 
 func newWriter(
 	platform Platform,
@@ -53,10 +44,11 @@ func newWriter(
 	return
 }
 
-func writeHeaders(platform Platform, buffers map[Lang]*bytes.Buffer) error {
+func writeHeaders(platform Platform, buffers map[Lang]*bytes.Buffer, t time.Time) error {
 	headerArgs := &HeaderArgs{}
 	for lang, buf := range buffers {
 		headerArgs.Lang = lang
+		headerArgs.Time = t
 		if _, err := buf.WriteString(platform.Header(headerArgs)); err != nil {
 			return err
 		}
@@ -116,6 +108,7 @@ func WriteLocalizations(
 	platform Platform,
 	dir ResDir,
 	localizations Localizations,
+	formatArgs LocalizationFormatArgs,
 	defLocLang Lang,
 	defLocPath string,
 ) (error error) {
@@ -125,7 +118,7 @@ func WriteLocalizations(
 	}
 
 	locIndices := map[Lang]int{}
-	locCounts := localizationsCount(localizations)
+	locCounts := localizations.Count()
 	locStringArgs := &LocalizedStringArgs{}
 
 	// Prepare string buffers for each language
@@ -135,7 +128,7 @@ func WriteLocalizations(
 	}
 
 	// Write headers
-	if error = writeHeaders(platform, buffers); error != nil {
+	if error = writeHeaders(platform, buffers, time.Now()); error != nil {
 		return
 	}
 
@@ -150,6 +143,7 @@ func WriteLocalizations(
 			locStringArgs.Key = key
 			locStringArgs.Lang = lang
 			locStringArgs.Value = value
+			locStringArgs.FormatArgs = formatArgs[key]
 
 			// Write a localized string
 			localizedString := platform.LocalizedString(locStringArgs)

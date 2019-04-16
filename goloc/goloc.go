@@ -23,7 +23,10 @@ type Lang = string
 type Key = string
 
 // Localizations represents a mapping between a localized string key and it's values for different languages.
-type Localizations = map[Key]map[Lang]string
+type Localizations map[Key]map[Lang]string
+
+// LocalizationFormatArgs represents a mapping between a localized string key and its format arguments.
+type LocalizationFormatArgs map[Key][]FormatKey
 
 // FormatKey represents a name of the format.
 type FormatKey = string
@@ -124,7 +127,7 @@ func Run(
 		log.Fatal(err)
 	}
 
-	localizations, warn, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing, emptyLocalizationMatch)
+	localizations, fArgs, warn, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing, emptyLocalizationMatch)
 	if err != nil {
 		log.Fatal(err)
 	} else {
@@ -137,9 +140,23 @@ func Run(
 		}
 	}
 
-	err = WriteLocalizations(platform, resDir, localizations, defaultLocalization, defaultLocalizationPath)
+	if p, ok := platform.(Preprocessor); ok {
+		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	err = WriteLocalizations(platform, resDir, localizations, fArgs, defaultLocalization, defaultLocalizationPath)
 	if err != nil {
 		log.Fatalf(`Can't write localizations. Reason: %v.`, err)
+	}
+
+	if p, ok := platform.(Postprocessor); ok {
+		err := p.Postprocess(PostprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
