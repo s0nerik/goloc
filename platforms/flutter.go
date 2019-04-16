@@ -121,6 +121,9 @@ Map<String, LibraryLoader> _deferredLibraries = {
 `, loc)
 		builder.WriteString(line)
 	}
+	builder.WriteString(`// ignore: unnecessary_new
+  'messages': () => new Future.value(null),
+`)
 	builder.WriteString("};\n")
 
 	// _findExact implementation
@@ -134,8 +137,11 @@ MessageLookupByLibrary _findExact(localeName) {
 `, loc, loc)
 		builder.WriteString(line)
 	}
-	builder.WriteString(fmt.Sprintf(`    default:
-      return messages_%s.messages;`, defaultLocale))
+	builder.WriteString(fmt.Sprintf(`    case 'messages':
+      return messages_%s.messages;
+`, defaultLocale))
+	builder.WriteString(`    default:
+      return null;`)
 
 	// Footer
 	builder.WriteString(`
@@ -263,7 +269,7 @@ func buildFormatArgsList(fArgs []goloc.FormatKey, formats goloc.Formats) string 
 		var argNameBuilder strings.Builder
 
 		f := formats[fKey]
-		matches := re.SprintfRegexp().FindStringSubmatch("%"+f)
+		matches := re.SprintfRegexp().FindStringSubmatch("%" + f)
 		if len(matches) >= 5 {
 			valueType := matches[5]
 			switch valueType {
