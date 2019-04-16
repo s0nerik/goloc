@@ -3,6 +3,7 @@ package platforms
 import (
 	"fmt"
 	"github.com/s0nerik/goloc/goloc"
+	"github.com/s0nerik/goloc/goloc/re"
 	"github.com/s0nerik/goloc/platforms/registry"
 	"io/ioutil"
 	"path/filepath"
@@ -55,7 +56,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
 func (flutter) LocalizedString(args *goloc.LocalizedStringArgs) string {
 	if len(args.FormatArgs) > 0 {
-		fArgs := buildFormatArgsList(args.FormatArgs)
+		fArgs := buildFormatArgsList(args.FormatArgs, nil)
 		return fmt.Sprintf("        \"%s\": (%s) => sprintf(\"%s\", [%s]),\n", args.Key, fArgs, args.Value, fArgs)
 	} else {
 		return fmt.Sprintf("        \"%s\": MessageLookupByLibrary.simpleMessage(\"%s\"),\n", args.Key, args.Value)
@@ -218,8 +219,9 @@ class AppLocalizations {
 			str := fmt.Sprintf("  String get %s => Intl.message('', name: '%s');\n", key, key)
 			builder.WriteString(str)
 		} else {
-			argsStr := buildFormatArgsList(fArgs)
-			str := fmt.Sprintf("  String %s(%s) => Intl.message('', name: '%s', args: [%s]);\n", key, argsStr, key, argsStr)
+			typedArgsStr := buildFormatArgsList(fArgs, args.Formats)
+			argsStr := buildFormatArgsList(fArgs, nil)
+			str := fmt.Sprintf("  String %s(%s) => Intl.message('', name: '%s', args: [%s]);\n", key, typedArgsStr, key, argsStr)
 			builder.WriteString(str)
 		}
 	}
@@ -253,16 +255,32 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 	return builder.String()
 }
 
-func buildFormatArgsList(fArgs []string) string {
+// buildFormatArgsList returns a ready-to-use list of format arguments for Dart.
+// If `formats` are specified - returns a list of typed elements, otherwise - untyped
+func buildFormatArgsList(fArgs []goloc.FormatKey, formats goloc.Formats) string {
 	var argsListBuilder strings.Builder
-	for i := range fArgs {
-		var argName string
-		if i < len(fArgs)-1 {
-			argName = fmt.Sprintf("arg%v, ", i)
-		} else {
-			argName = fmt.Sprintf("arg%v", i)
+	for i, fKey := range fArgs {
+		var argNameBuilder strings.Builder
+
+		f := formats[fKey]
+		matches := re.SprintfRegexp().FindStringSubmatch("%"+f)
+		if len(matches) >= 5 {
+			valueType := matches[5]
+			switch valueType {
+			case "s":
+				argNameBuilder.WriteString("String ")
+			case "i", "d", "x", "X", "o", "O":
+				argNameBuilder.WriteString("int ")
+			case "e", "E", "f", "F", "g", "G":
+				argNameBuilder.WriteString("double ")
+			}
 		}
-		argsListBuilder.WriteString(argName)
+
+		argNameBuilder.WriteString(fmt.Sprintf("arg%v", i))
+		if i < len(fArgs)-1 {
+			argNameBuilder.WriteString(", ")
+		}
+		argsListBuilder.WriteString(argNameBuilder.String())
 	}
 	return argsListBuilder.String()
 }

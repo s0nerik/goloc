@@ -37,3 +37,19 @@ func LangColumnNameRegexp() *regexp.Regexp {
 	})
 	return langColumnRegexp
 }
+
+var sprintRegexpInitializer sync.Once
+var sprintfRegexp *regexp.Regexp
+
+// SprintfRegexp returns a regexp that is used to distinguish between value type for type-safe format arguments
+// Group #5 includes value type information
+func SprintfRegexp() *regexp.Regexp {
+	sprintRegexpInitializer.Do(func() {
+		r, err := regexp.Compile(`%(?:(\d+)\$)?([\+\-\#0 ]*)(\d+|\*)?(?:\.(\d+|\*))?([a-z%])`)
+		if err != nil {
+			log.Fatalf("Can't create a regext for 'sprintf' format. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
+		}
+		sprintfRegexp = r
+	})
+	return sprintfRegexp
+}
