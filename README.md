@@ -34,6 +34,7 @@ contain binaries only for **amd64** architecture for **macOS**, **Linux** and **
 
 - Android
 - iOS
+- Flutter (experimental)
 - JSON
 
 ## Setup
