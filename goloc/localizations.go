@@ -166,6 +166,7 @@ func keyLocalizations(
 ) (keyLoc map[Lang]string, warnings []error, error error) {
 	keyLoc = map[Lang]string{}
 	for i, lang := range langColumns {
+		keyLoc[lang] = ""
 		if i < len(row) {
 			val := strings.TrimSpace(row[i].(string))
 			if match := emptyLocalizationRegexp.MatchString(val); !match {

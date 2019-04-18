@@ -57,3 +57,7 @@ type Platform interface {
 	// Returns replacement characters for any special character that needs to be guarded in the platform resources.
 	ReplacementChars() map[string]string
 }
+
+type FallbackStringWriter interface {
+	FallbackString(args *LocalizedStringArgs) string
+}

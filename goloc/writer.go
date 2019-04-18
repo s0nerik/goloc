@@ -146,9 +146,16 @@ func WriteLocalizations(
 			locStringArgs.FormatArgs = formatArgs[key]
 
 			// Write a localized string
-			localizedString := platform.LocalizedString(locStringArgs)
-			if _, error = buf.WriteString(localizedString); error != nil {
-				return
+			if value != "" {
+				localizedString := platform.LocalizedString(locStringArgs)
+				if _, error = buf.WriteString(localizedString); error != nil {
+					return
+				}
+			} else if p, ok := platform.(FallbackStringWriter); ok {
+				fallbackString := p.FallbackString(locStringArgs)
+				if _, error = buf.WriteString(fallbackString); error != nil {
+					return
+				}
 			}
 			locIndices[lang]++
 		}

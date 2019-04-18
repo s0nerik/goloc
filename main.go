@@ -25,7 +25,7 @@ var (
 )
 
 func main() {
-	kingpin.Version("0.9.4")
+	kingpin.Version("0.9.5")
 	kingpin.Parse()
 
 	platform, err := resolver.FindPlatform(*platformName)
