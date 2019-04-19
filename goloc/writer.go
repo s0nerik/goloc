@@ -112,11 +112,6 @@ func WriteLocalizations(
 	defLocLang Lang,
 	defLocPath string,
 ) (error error) {
-	// Make sure we can access resources dir
-	if _, error = os.Stat(dir); error != nil {
-		return
-	}
-
 	locIndices := map[Lang]int{}
 	locCounts := localizations.Count()
 	locStringArgs := &LocalizedStringArgs{}

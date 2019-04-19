@@ -140,6 +140,18 @@ func Run(
 		}
 	}
 
+	// Make sure we can access resources dir
+	if _, err := os.Stat(resDir); err != nil {
+		if os.IsNotExist(err) {
+			err := os.MkdirAll(resDir, 0755)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			log.Fatal(err)
+		}
+	}
+
 	if p, ok := platform.(Preprocessor); ok {
 		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
 		if err != nil {
