@@ -136,10 +136,14 @@ task "fetchLocalizations"(type: Exec) {
 
 ### Flutter
 
+Localized strings can be accessed through `AppLocalizations.of(context)`
+
+Requirements:
+
 - Add `sprintf: ^4.0.2` to the `dependencies` section of `pubspec.yaml`
 - Add `AppLocalizationsDelegate()` to `localizationsDelegates` of the app widget constructor
 - Specify supported localizations in `supportedLocales` of the app widget constructor
-- (Recommended) Add `DefaultIntlLocaleDelegate()` to `localizationsDelegates`
+- (Recommended) Add `DefaultIntlLocaleDelegate()` to `localizationsDelegates` of the app widget constructor. This will make `intl`-dependent formatters use currently selected locale.
 
 ```dart
 class DefaultIntlLocaleDelegate extends LocalizationsDelegate<Null> {
