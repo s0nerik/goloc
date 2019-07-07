@@ -161,6 +161,25 @@ class DefaultIntlLocaleDelegate extends LocalizationsDelegate<Null> {
 }
 ```
 
+Example **bash** localization script:
+
+```bash
+#!/bin/bash
+
+case "$OSTYPE" in
+  darwin*)  EXECUTABLE="darwin_amd64" ;;
+  linux*)   EXECUTABLE="linux_amd64" ;;
+  msys*)    EXECUTABLE="windows_amd64.exe" ;;
+  *)
+	  echo "Platform is not supported: $OSTYPE"
+	  exit 1
+  ;;
+esac
+
+goloc/${EXECUTABLE} -c goloc/client_secret.json -p flutter -s 1MbtglvGyEey3gH8yh4c9QovCIbtl5EcwqWqTZUiNga8 -t localizations -r lib/intl
+```
+
+
 ## License
 
 Released under the [MIT License](https://github.com/s0nerik/goloc/blob/master/LICENSE).
