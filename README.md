@@ -14,6 +14,8 @@
 	- [Localizations sheet](#localizations-sheet)
 	- [Formats sheet](#formats-sheet)
 - [Usage](#usage)
+	- [Android](#android)
+	- [Flutter](#flutter)
 - [License](#license)
 
 ## Features
@@ -30,11 +32,11 @@
 **goloc** can be built for each OS/architecture supported by golang, but release archives
 contain binaries only for **amd64** architecture for **macOS**, **Linux** and **Windows**.
 
-## Supported platforms / formats
+## Supported formats
 
-- Android
+- [Android](#android)
 - iOS
-- Flutter (experimental)
+- [Flutter](#flutter)
 - JSON
 
 ## Setup
@@ -92,6 +94,68 @@ On the example above you can see a **goloc**-compatible formats sheet. The rules
 
 - Create a script or build task definition with parameters best suited for your project. To see available parameters, run `goloc --help`. **goloc** is distributed in form of separate executables for each platform, so don't forget to take that into account creating localization script.
 - Execute the script/task whenever you want to update localized strings. **goloc** will automatically replace any existing localization files with the updated ones.
+
+### Android
+
+No special configuration in code is required.
+
+Example **gradle** task specification:
+
+```gradle
+task "fetchLocalizations"(type: Exec) {
+    def osName = System.getProperty('os.name').toLowerCase()
+    def isWindows = osName.contains("win")
+    def isMac = osName.contains("mac")
+    def isUnix = osName.contains("nix") || osName.contains("nux") || osName.contains("aix")
+
+    def params = [
+            '--credentials', "goloc/client_secret.json",
+            '--platform', 'android',
+            '--spreadsheet', '1MbtglvGyEey3gH8yh4c9QovCIbtl5EcwqWqTZUiNga8',
+            '--tab', "localizations",
+            "--key-column", "key",
+            '--resources', "app/src/main/res/",
+            '--default-localization', 'en',
+            '--default-localization-file-path', "app/src/main/res/values/localized_strings.xml"
+    ]
+
+    if (isWindows) {
+        params = ['cmd', '/c', 'goloc\\windows_amd64.exe'] + params
+    } else if (isMac) {
+        params = ['./goloc/darwin_amd64'] + params
+    } else if (isUnix) {
+        params = ['./goloc/linux_amd64'] + params
+    } else {
+        logger.error('Your OS is not supported.')
+        return
+    }
+
+    commandLine params
+}
+```
+
+### Flutter
+
+- Add `sprintf: ^4.0.2` to the `dependencies` section of `pubspec.yaml`
+- Add `AppLocalizationsDelegate()` to `localizationsDelegates` of the app widget constructor
+- Specify supported localizations in `supportedLocales` of the app widget constructor
+- (Recommended) Add `DefaultIntlLocaleDelegate()` to `localizationsDelegates`
+
+```dart
+class DefaultIntlLocaleDelegate extends LocalizationsDelegate<Null> {
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<Null> load(Locale locale) {
+    Intl.defaultLocale = locale.toLanguageTag();
+    return Future.value(null);
+  }
+
+  @override
+  bool shouldReload(LocalizationsDelegate<AppLocalizations> old) => false;
+}
+```
 
 ## License
 
