@@ -128,7 +128,8 @@ func WriteLocalizations(
 	}
 
 	// Write localization strings
-	for key, keyLoc := range localizations {
+	for _, key := range localizations.SortedKeys() {
+		keyLoc := localizations[key]
 		for lang, value := range keyLoc {
 			buf := buffers[lang]
 

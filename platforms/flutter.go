@@ -129,7 +129,7 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
 	// Localized strings
 	var locBuilder strings.Builder
-	for key := range args.Localizations {
+	for _, key := range args.Localizations.SortedKeys() {
 		fArgs := args.FormatArgs[key]
 		if len(fArgs) <= 0 {
 			str := fmt.Sprintf("  String get %s;\n", key)

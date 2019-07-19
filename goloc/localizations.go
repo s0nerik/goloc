@@ -4,6 +4,7 @@ import (
 	"log"
 	"reflect"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/s0nerik/goloc/goloc/re"
@@ -255,4 +256,12 @@ func (loc Localizations) Locales() (locales []string) {
 	}
 
 	return locales
+}
+
+func (loc Localizations) SortedKeys() (sortedKeys []Key) {
+	for k := range loc {
+		sortedKeys = append(sortedKeys, k)
+	}
+	sort.Strings(sortedKeys)
+	return sortedKeys
 }
