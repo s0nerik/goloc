@@ -5,6 +5,7 @@ import (
 )
 
 var platforms []goloc.Platform
+var sources map[string]goloc.Source
 
 // Register adds a new platform into the registry.
 func Register(p goloc.Platform) {
@@ -14,4 +15,12 @@ func Register(p goloc.Platform) {
 // Platforms returns all platforms registered in the registry.
 func Platforms() []goloc.Platform {
 	return platforms
+}
+
+func RegisterSource(s goloc.Source) {
+	sources[s.Name()] = s
+}
+
+func GetSource(name string) goloc.Source {
+	return sources[name]
 }
