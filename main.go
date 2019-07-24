@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/s0nerik/goloc/goloc"
-	"github.com/s0nerik/goloc/resolver"
+	"github.com/s0nerik/goloc/registry"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
 
@@ -31,8 +31,8 @@ func main() {
 	kingpin.Version("0.9.7")
 	kingpin.Parse()
 
-	platform, err := resolver.FindPlatform(*platformName)
-	if err != nil {
+	platform := registry.FindPlatform(*platformName)
+	if platform == nil {
 		log.Fatalf(`Platform "%v" is not supported.`, *platformName)
 	}
 

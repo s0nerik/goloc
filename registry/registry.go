@@ -12,9 +12,16 @@ func Register(p goloc.Platform) {
 	platforms = append(platforms, p)
 }
 
-// Platforms returns all platforms registered in the registry.
-func Platforms() []goloc.Platform {
-	return platforms
+// FindPlatform looks up and, if succeeds, returns a Platform given its name.
+func FindPlatform(name string) goloc.Platform {
+	for _, p := range platforms {
+		for _, n := range p.Names() {
+			if n == name {
+				return p
+			}
+		}
+	}
+	return nil
 }
 
 func RegisterSource(s goloc.Source) {
