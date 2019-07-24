@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/s0nerik/goloc/goloc"
-	"github.com/s0nerik/goloc/platforms/registry"
+	"github.com/s0nerik/goloc/registry"
 )
 
 func init() {

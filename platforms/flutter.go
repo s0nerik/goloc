@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/goloc/re"
-	"github.com/s0nerik/goloc/platforms/registry"
+	"github.com/s0nerik/goloc/registry"
 	"io/ioutil"
 	"path/filepath"
 	"strings"

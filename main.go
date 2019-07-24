@@ -2,9 +2,12 @@ package main
 
 import (
 	"github.com/s0nerik/goloc/goloc"
-	"github.com/s0nerik/goloc/platforms/resolver"
+	"github.com/s0nerik/goloc/resolver"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
+
+	// Register all supported platforms
+	_ "github.com/s0nerik/goloc/platforms"
 )
 
 var (
