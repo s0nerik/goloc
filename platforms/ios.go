@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	registry.Register(&ios{})
+	registry.RegisterPlatform(&ios{})
 }
 
 type ios struct{}

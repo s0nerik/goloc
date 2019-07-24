@@ -7,8 +7,8 @@ import (
 var platforms []goloc.Platform
 var sources map[string]goloc.Source
 
-// Register adds a new platform into the registry.
-func Register(p goloc.Platform) {
+// RegisterPlatform adds a new platform into the registry.
+func RegisterPlatform(p goloc.Platform) {
 	platforms = append(platforms, p)
 }
 

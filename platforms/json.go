@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	registry.Register(&json{})
+	registry.RegisterPlatform(&json{})
 }
 
 type json struct{}

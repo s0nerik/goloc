@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	registry.Register(&flutter{})
+	registry.RegisterPlatform(&flutter{})
 }
 
 type flutter struct{}

@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	registry.Register(&android{})
+	registry.RegisterPlatform(&android{})
 }
 
 type android struct{}
