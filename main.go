@@ -31,7 +31,7 @@ func main() {
 	kingpin.Version("0.9.7")
 	kingpin.Parse()
 
-	platform := registry.FindPlatform(*platformName)
+	platform := registry.GetPlatform(*platformName)
 	if platform == nil {
 		log.Fatalf(`Platform "%v" is not supported.`, *platformName)
 	}
