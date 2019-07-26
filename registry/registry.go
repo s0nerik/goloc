@@ -5,14 +5,9 @@ import (
 )
 
 var platforms []goloc.Platform
-var sources map[string]goloc.Source
 
 func RegisterPlatform(p goloc.Platform) {
 	platforms = append(platforms, p)
-}
-
-func RegisterSource(s goloc.Source) {
-	sources[s.Name()] = s
 }
 
 func GetPlatform(name string) goloc.Platform {
@@ -24,8 +19,4 @@ func GetPlatform(name string) goloc.Platform {
 		}
 	}
 	return nil
-}
-
-func GetSource(name string) goloc.Source {
-	return sources[name]
 }
