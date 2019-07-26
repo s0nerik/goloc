@@ -12,14 +12,17 @@ import (
 )
 
 var (
+	// Google Sheets params
 	credentials                = kingpin.Flag(`credentials`, `Credentials to access a spreadsheet.`).Short('c').Default(`client_secret.json`).String()
-	platformName               = kingpin.Flag(`platform`, `Target platform name.`).Short('p').Required().String()
 	sheetID                    = kingpin.Flag(`spreadsheet`, `Spreadsheet ID.`).Short('s').Required().String()
-	resDir                     = kingpin.Flag(`resources`, `Path to the resources folder in the project.`).Short('r').Required().String()
+	formatsTabName             = kingpin.Flag(`formats-tab`, `Formats tab name.`).Short('f').Default(`formats`).String()
 	tabName                    = kingpin.Flag(`tab`, `Localizations tab name.`).Short('t').Required().String()
+
+	// General params
+	platformName               = kingpin.Flag(`platform`, `Target platform name.`).Short('p').Required().String()
+	resDir                     = kingpin.Flag(`resources`, `Path to the resources folder in the project.`).Short('r').Required().String()
 	keyColumn                  = kingpin.Flag(`key-column`, `Title of the key column.`).Default(`key`).String()
 	stopOnMissing              = kingpin.Flag(`stop-on-missing`, `Stop execution if missing localization is found.`).Default(`false`).Bool()
-	formatsTabName             = kingpin.Flag(`formats-tab`, `Formats tab name.`).Short('f').Default(`formats`).String()
 	formatNameColumn           = kingpin.Flag(`format-name-column`, `Title of the format name column.`).Default(`format`).String()
 	defFormatName              = kingpin.Flag(`default-format-name`, `Name of the format to be used in place of "{}"`).Default("").String()
 	defLoc                     = kingpin.Flag(`default-localization`, `Default localization language (e.g. "en"). Specifying this doesn't have any effect if the "--default-localization-file-path" is not specified.`).Default(`en`).String()
