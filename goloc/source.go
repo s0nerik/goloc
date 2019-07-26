@@ -1,6 +1,9 @@
 package goloc
 
 type Source interface {
-	Formats() ([][]string, error)
-	Localizations() ([][]string, error)
+	FormatsDocumentName() string
+	LocalizationsDocumentName() string
+
+	Formats() ([][]RawCell, error)
+	Localizations() ([][]RawCell, error)
 }

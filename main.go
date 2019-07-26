@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/registry"
+	"github.com/s0nerik/goloc/sources"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
 
@@ -31,10 +32,12 @@ func main() {
 	kingpin.Version("0.9.7")
 	kingpin.Parse()
 
+	source := sources.GoogleSheets(*credentials, *sheetID, *formatsTabName, *tabName)
+
 	platform := registry.GetPlatform(*platformName)
 	if platform == nil {
 		log.Fatalf(`Platform "%v" is not supported.`, *platformName)
 	}
 
-	goloc.Run(platform, *resDir, *credentials, *sheetID, *tabName, *keyColumn, *formatsTabName, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing, *missingLocalizationsReport, *defFormatName, *emptyLocalizationMatch)
+	goloc.Run(source, platform, *resDir, *keyColumn, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing, *missingLocalizationsReport, *defFormatName, *emptyLocalizationMatch)
 }

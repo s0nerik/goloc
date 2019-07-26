@@ -8,7 +8,7 @@ import (
 // ParseFormats parses formats given the raw table data and returns, if successful, mappings
 // to the actual platform format for each format name.
 func ParseFormats(
-	rawData [][]string,
+	rawData [][]RawCell,
 	platform Platform,
 	formatsTabName string,
 	formatColumnTitle string,
@@ -66,7 +66,7 @@ func ParseFormats(
 
 func columnIndices(
 	platform Platform,
-	rawData [][]string,
+	rawData [][]RawCell,
 	formatsTabName string,
 	formatColumnTitle string,
 ) (formatColIndex int, platformColIndex int, actualPlatformName string, err error) {

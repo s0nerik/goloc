@@ -7,7 +7,7 @@ import (
 )
 
 func TestFormatsEmptyData(t *testing.T) {
-	var data [][]string
+	var data [][]RawCell
 
 	platform := newMockPlatform(nil)
 	_, err := ParseFormats(data, platform, "", "", "{}")

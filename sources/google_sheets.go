@@ -1,6 +1,7 @@
 package sources
 
 import (
+	"github.com/s0nerik/goloc/goloc"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
@@ -71,10 +72,18 @@ func fetchRawStringValues(api *sheets.SpreadsheetsService, sheetID string, tab s
 	return result, err
 }
 
-func (s googleSheets) Formats() ([][]string, error) {
+func (s googleSheets) FormatsDocumentName() string {
+	return s.formatsTab
+}
+
+func (s googleSheets) LocalizationsDocumentName() string {
+	return s.localizationsTab
+}
+
+func (s googleSheets) Formats() ([][]goloc.RawCell, error) {
 	return fetchRawStringValues(s.sheetsAPI, s.sheetID, s.formatsTab)
 }
 
-func (s googleSheets) Localizations() ([][]string, error) {
+func (s googleSheets) Localizations() ([][]goloc.RawCell, error) {
 	return fetchRawStringValues(s.sheetsAPI, s.sheetID, s.localizationsTab)
 }

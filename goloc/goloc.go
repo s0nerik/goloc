@@ -1,7 +1,6 @@
 package goloc
 
 import (
-	"github.com/s0nerik/goloc/sources"
 	"log"
 	"os"
 	"regexp"
@@ -65,13 +64,10 @@ func fetchEverythingRaw(source Source) (rawFormats, rawLocalizations [][]string,
 
 // Run launches the actual process of fetching, parsing and writing the localization files.
 func Run(
+	source Source,
 	platform Platform,
 	resDir string,
-	credFilePath string,
-	sheetID string,
-	tabName string,
 	keyColumn string,
-	formatsTabName string,
 	formatNameColumn string,
 	defaultLocalization string,
 	defaultLocalizationPath string,
@@ -80,19 +76,17 @@ func Run(
 	defFormatName string,
 	emptyLocalizationMatch *regexp.Regexp,
 ) {
-	source := sources.GoogleSheets(credFilePath, sheetID, formatsTabName, tabName)
-
 	rawFormats, rawLocalizations, err := fetchEverythingRaw(source)
 	if err != nil {
-		log.Fatalf(`Can't fetch data from "%v" sheet. Reason: %v.`, sheetID, err)
+		log.Fatalf(`Can't fetch data. Reason: %v.`, err)
 	}
 
-	formats, err := ParseFormats(rawFormats, platform, formatsTabName, formatNameColumn, defFormatName)
+	formats, err := ParseFormats(rawFormats, platform, source.FormatsDocumentName(), formatNameColumn, defFormatName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	localizations, fArgs, warn, err := ParseLocalizations(rawLocalizations, platform, formats, tabName, keyColumn, stopOnMissing, emptyLocalizationMatch)
+	localizations, fArgs, warn, err := ParseLocalizations(rawLocalizations, platform, formats, source.LocalizationsDocumentName(), keyColumn, stopOnMissing, emptyLocalizationMatch)
 	if err != nil {
 		log.Fatal(err)
 	} else {

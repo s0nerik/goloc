@@ -17,7 +17,7 @@ var DefaultEmptyLocRegexp, _ = regexp.Compile("^$")
 // ParseLocalizations parses formats given the raw table data and returns, if successful, mappings
 // for each localized string in different languages.
 func ParseLocalizations(
-	rawData [][]string,
+	rawData [][]RawCell,
 	platform Platform,
 	formats Formats,
 	tabName string,
@@ -69,7 +69,7 @@ func ParseLocalizations(
 }
 
 func localizationColumnIndices(
-	rawData [][]string,
+	rawData [][]RawCell,
 	tabName string,
 	keyColumn string,
 ) (keyColIndex int, langCols langColumns, err error) {
