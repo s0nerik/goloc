@@ -7,7 +7,7 @@ import (
 )
 
 func TestFormatsEmptyData(t *testing.T) {
-	var data [][]interface{}
+	var data [][]string
 
 	platform := newMockPlatform(nil)
 	_, err := ParseFormats(data, platform, "", "", "{}")
@@ -17,7 +17,7 @@ func TestFormatsEmptyData(t *testing.T) {
 }
 
 func TestFormatsEmptyFirstRow(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{},
 		{"x"},
 	}
@@ -30,7 +30,7 @@ func TestFormatsEmptyFirstRow(t *testing.T) {
 }
 
 func TestFormatsMissingFormatColumn(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"mock"},
 	}
 
@@ -42,7 +42,7 @@ func TestFormatsMissingFormatColumn(t *testing.T) {
 }
 
 func TestFormatsMissingPlatformColumn(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"format"},
 	}
 
@@ -54,7 +54,7 @@ func TestFormatsMissingPlatformColumn(t *testing.T) {
 }
 
 func TestFormatsMissingFormatKey(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"mock", "format"},
 		{""},
 	}
@@ -67,7 +67,7 @@ func TestFormatsMissingFormatKey(t *testing.T) {
 }
 
 func TestFormatsMissingFormatValue1(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"format", "mock"},
 		{""},
 	}
@@ -80,7 +80,7 @@ func TestFormatsMissingFormatValue1(t *testing.T) {
 }
 
 func TestFormatsMissingFormatValue2(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"format", "mock"},
 		{"x", ""},
 	}
@@ -93,7 +93,7 @@ func TestFormatsMissingFormatValue2(t *testing.T) {
 }
 
 func TestFormatsMissingFormatValue3(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"format", "mock"},
 		{"x", "   "},
 	}
@@ -106,7 +106,7 @@ func TestFormatsMissingFormatValue3(t *testing.T) {
 }
 
 func TestFormatsFormatValidation(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"format", "mock"},
 		{"x", "s"},
 		{"y", "%s"},
@@ -126,44 +126,4 @@ func TestFormatsFormatValidation(t *testing.T) {
 	platform.AssertCalled(t, "ValidateFormat", "s")
 	platform.AssertCalled(t, "ValidateFormat", "%s")
 	platform.AssertNumberOfCalls(t, "ValidateFormat", 2)
-}
-
-func TestFormatsWrongValueType(t *testing.T) {
-	data := [][]interface{}{
-		{"format", "mock"},
-		{"x", "s"},
-		{"y", 1},
-		{"z", "%s"},
-	}
-
-	platform := newMockPlatform(nil)
-
-	_, err := ParseFormats(data, platform, "", "format", "{}")
-	if assert.Error(t, err) {
-		assert.IsType(t, &wrongValueTypeError{}, err)
-	}
-
-	platform.AssertCalled(t, "ValidateFormat", "s")
-	platform.AssertNotCalled(t, "ValidateFormat", "%s")
-	platform.AssertNumberOfCalls(t, "ValidateFormat", 1)
-}
-
-func TestFormatsWrongKeyType(t *testing.T) {
-	data := [][]interface{}{
-		{"format", "mock"},
-		{"x", "s"},
-		{1, "%s"},
-		{"z", "%s"},
-	}
-
-	platform := newMockPlatform(nil)
-
-	_, err := ParseFormats(data, platform, "", "format", "{}")
-	if assert.Error(t, err) {
-		assert.IsType(t, &wrongKeyTypeError{}, err)
-	}
-
-	platform.AssertCalled(t, "ValidateFormat", "s")
-	platform.AssertNotCalled(t, "ValidateFormat", "%s")
-	platform.AssertNumberOfCalls(t, "ValidateFormat", 1)
 }

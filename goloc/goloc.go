@@ -13,6 +13,8 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
+type RawCell = string
+
 // Lang represents a language code.
 type Lang = string
 

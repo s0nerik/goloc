@@ -66,7 +66,7 @@ func ParseFormats(
 
 func columnIndices(
 	platform Platform,
-	rawData [][]interface{},
+	rawData [][]string,
 	formatsTabName string,
 	formatColumnTitle string,
 ) (formatColIndex int, platformColIndex int, actualPlatformName string, err error) {

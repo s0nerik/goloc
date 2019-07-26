@@ -1,7 +1,6 @@
 package sources
 
 import (
-	"github.com/s0nerik/goloc/goloc"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
@@ -22,7 +21,7 @@ func GoogleSheets(
 	sheetID string,
 	formatsTab string,
 	localizationsTab string,
-) goloc.Source {
+) *googleSheets {
 	return &googleSheets{
 		sheetID:          sheetID,
 		formatsTab:       formatsTab,
