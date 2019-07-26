@@ -1,6 +1,7 @@
 package goloc
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -53,10 +54,10 @@ func fetchEverythingRaw(source Source) (rawFormats, rawLocalizations [][]string,
 	wg.Wait()
 
 	if formatsError != nil {
-		return nil, nil, formatsError
+		return nil, nil, fmt.Errorf(`can't load formats (%v)`, formatsError)
 	}
 	if localizationsError != nil {
-		return nil, nil, localizationsError
+		return nil, nil, fmt.Errorf(`can't load localizations (%v)`, formatsError)
 	}
 
 	return
