@@ -1,7 +1,7 @@
 package goloc
 
 import (
-	"io/ioutil"
+	"github.com/s0nerik/goloc/sources"
 	"log"
 	"os"
 	"regexp"
@@ -11,9 +11,6 @@ import (
 	"sync"
 
 	"github.com/olekukonko/tablewriter"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/sheets/v4"
 )
 
 // Lang represents a language code.
@@ -37,52 +34,18 @@ type Formats = map[FormatKey]string
 // ResDir represents a resources directory path.
 type ResDir = string
 
-func sheetsAPI(credFilePath string) *sheets.SpreadsheetsService {
-	ctx := context.Background()
-
-	sec, err := ioutil.ReadFile(credFilePath)
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
-
-	config, err := google.JWTConfigFromJSON(sec, "https://www.googleapis.com/auth/spreadsheets.readonly")
-	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
-	}
-
-	s, err := sheets.New(config.Client(ctx))
-	if err != nil {
-		log.Fatalf("Unable to retrieve Sheets Client %v", err)
-	}
-
-	return s.Spreadsheets
-}
-
-func fetchRawValues(api *sheets.SpreadsheetsService, sheetID string, tab string) ([][]interface{}, error) {
-	resp, err := api.Values.Get(sheetID, tab).Do()
-	if err != nil {
-		return nil, err
-	}
-	return resp.Values, nil
-}
-
-func fetchEverythingRaw(
-	api *sheets.SpreadsheetsService,
-	sheetID string,
-	formatsTab string,
-	localizationsTab string,
-) (rawFormats, rawLocalizations [][]interface{}, err error) {
+func fetchEverythingRaw(source Source) (rawFormats, rawLocalizations [][]string, err error) {
 	var formatsError error
 	var localizationsError error
 
 	var wg sync.WaitGroup
 	go func() {
 		defer wg.Done()
-		rawFormats, formatsError = fetchRawValues(api, sheetID, formatsTab)
+		rawFormats, formatsError = source.Formats()
 	}()
 	go func() {
 		defer wg.Done()
-		rawLocalizations, localizationsError = fetchRawValues(api, sheetID, localizationsTab)
+		rawLocalizations, localizationsError = source.Localizations()
 	}()
 
 	wg.Add(2)
@@ -115,9 +78,9 @@ func Run(
 	defFormatName string,
 	emptyLocalizationMatch *regexp.Regexp,
 ) {
-	api := sheetsAPI(credFilePath)
+	source := sources.GoogleSheets(credFilePath, sheetID, formatsTabName, tabName)
 
-	rawFormats, rawLocalizations, err := fetchEverythingRaw(api, sheetID, formatsTabName, tabName)
+	rawFormats, rawLocalizations, err := fetchEverythingRaw(source)
 	if err != nil {
 		log.Fatalf(`Can't fetch data from "%v" sheet. Reason: %v.`, sheetID, err)
 	}

@@ -8,7 +8,7 @@ import (
 // ParseFormats parses formats given the raw table data and returns, if successful, mappings
 // to the actual platform format for each format name.
 func ParseFormats(
-	rawData [][]interface{},
+	rawData [][]string,
 	platform Platform,
 	formatsTabName string,
 	formatColumnTitle string,
@@ -33,35 +33,27 @@ func ParseFormats(
 				platformName: actualPlatformName,
 			}
 		}
-		if key, ok := row[formatColIndex].(FormatKey); ok {
-			if val, ok := row[platformColIndex].(string); ok {
-				trimmedVal := strings.TrimSpace(val)
-				if len(trimmedVal) == 0 {
-					return nil, &formatValueNotSpecifiedError{
-						cell:         *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
-						platformName: actualPlatformName,
-					}
-				}
-				err := platform.ValidateFormat(trimmedVal)
-				if err != nil {
-					return nil, &formatValueInvalidError{
-						cell:         *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
-						platformName: actualPlatformName,
-						formatValue:  trimmedVal,
-						reason:       err,
-					}
-				}
-				formats[key] = trimmedVal
-			} else {
-				return nil, &wrongValueTypeError{
-					cell: *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
-				}
-			}
-		} else {
-			return nil, &wrongKeyTypeError{
-				cell: *NewCell(formatsTabName, actualRowIndex, uint(formatColIndex)),
+
+		key := row[formatColIndex]
+		val := row[platformColIndex]
+
+		trimmedVal := strings.TrimSpace(val)
+		if len(trimmedVal) == 0 {
+			return nil, &formatValueNotSpecifiedError{
+				cell:         *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
+				platformName: actualPlatformName,
 			}
 		}
+		err := platform.ValidateFormat(trimmedVal)
+		if err != nil {
+			return nil, &formatValueInvalidError{
+				cell:         *NewCell(formatsTabName, actualRowIndex, uint(platformColIndex)),
+				platformName: actualPlatformName,
+				formatValue:  trimmedVal,
+				reason:       err,
+			}
+		}
+		formats[key] = trimmedVal
 	}
 
 	// Handle default format ("{}")
