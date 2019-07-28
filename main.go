@@ -47,7 +47,7 @@ var (
 )
 
 func main() {
-	kingpin.Version("0.9.7")
+	kingpin.Version("0.9.8")
 	kingpin.Parse()
 
 	platform := registry.GetPlatform(*platformName)
