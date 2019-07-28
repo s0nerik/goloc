@@ -103,9 +103,11 @@ abstract class AppLocalizations {
 %s}
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+  static const supportedLanguages = %s;
+
   @override
   bool isSupported(Locale locale) {
-    return %s.contains(locale.languageCode);
+    return supportedLanguages.contains(locale.languageCode);
   }
 
   @override
