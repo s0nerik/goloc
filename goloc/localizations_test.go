@@ -8,7 +8,7 @@ import (
 )
 
 func formats() Formats {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"format", "mock"},
 		{"x", "s"},
 		{"y", "%s"},
@@ -20,14 +20,14 @@ func formats() Formats {
 	return formats
 }
 
-func parseTestLocalizations(data [][]interface{}, errorIfMissing bool, missingRegexp *regexp.Regexp) (loc Localizations, warnings []error, error error) {
+func parseTestLocalizations(data [][]RawCell, errorIfMissing bool, missingRegexp *regexp.Regexp) (loc Localizations, warnings []error, error error) {
 	p := newMockPlatform(nil)
 	loc, _, warnings, error = ParseLocalizations(data, p, formats(), "", "key", errorIfMissing, missingRegexp)
 	return
 }
 
 func TestLocalizationsEmptyData(t *testing.T) {
-	var data [][]interface{}
+	var data [][]RawCell
 
 	_, _, err := parseTestLocalizations(data, true, nil)
 	assert.Error(t, err)
@@ -35,7 +35,7 @@ func TestLocalizationsEmptyData(t *testing.T) {
 }
 
 func TestLocalizationsEmptyFirstRow(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{},
 		{"x"},
 	}
@@ -45,7 +45,7 @@ func TestLocalizationsEmptyFirstRow(t *testing.T) {
 }
 
 func TestLocalizationsNoKeyColumn(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"", "lang_en"},
 	}
 
@@ -55,7 +55,7 @@ func TestLocalizationsNoKeyColumn(t *testing.T) {
 }
 
 func TestLocalizationsNoLangColumns(t *testing.T) {
-	data := [][]interface{}{
+	data := [][]RawCell{
 		{"key", "something", "something else"},
 	}
 
@@ -65,7 +65,7 @@ func TestLocalizationsNoLangColumns(t *testing.T) {
 }
 
 func TestLocalizationsMissingKey(t *testing.T) {
-	dataBad := [][][]interface{}{
+	dataBad := [][][]RawCell{
 		{
 			{"key", "lang_en"},
 			{"", "something"},
@@ -88,7 +88,7 @@ func TestLocalizationsMissingKey(t *testing.T) {
 		},
 	}
 
-	dataGood := [][][]interface{}{
+	dataGood := [][][]RawCell{
 		{
 			{"key", "lang_en"},
 			{"k", "something"},
@@ -126,7 +126,7 @@ func TestLocalizationsMissingKey(t *testing.T) {
 }
 
 func TestLocalizationsMissingFormat(t *testing.T) {
-	dataBad := [][][]interface{}{
+	dataBad := [][][]RawCell{
 		{
 			{"key", "lang_en"},
 			{"p1", "something {x}"},
@@ -136,7 +136,7 @@ func TestLocalizationsMissingFormat(t *testing.T) {
 		},
 	}
 
-	dataGood := [][][]interface{}{
+	dataGood := [][][]RawCell{
 		{
 			{"key", "lang_en"},
 			{"p1", "something {x}"},
@@ -159,7 +159,7 @@ func TestLocalizationsMissingFormat(t *testing.T) {
 }
 
 func TestLocalizationsMissingLocalization(t *testing.T) {
-	dataBad := [][][]interface{}{
+	dataBad := [][][]RawCell{
 		{
 			{"key", "lang_en", "lang_ru"},
 			{"m", "something {y}"},
@@ -182,7 +182,7 @@ func TestLocalizationsMissingLocalization(t *testing.T) {
 		},
 	}
 
-	dataGood := [][][]interface{}{
+	dataGood := [][][]RawCell{
 		{
 			{"key", "lang_en", "lang_ru"},
 			{"p", "something {x}", "что-то {x}"},
@@ -210,7 +210,7 @@ func TestLocalizationsMissingLocalization(t *testing.T) {
 func TestLocalizationsMissingRegexpLocalization(t *testing.T) {
 	re, _ := regexp.Compile("^x$")
 
-	dataBad := [][][]interface{}{
+	dataBad := [][][]RawCell{
 		{
 			{"key", "lang_en"},
 			{"m", "x"},
@@ -221,7 +221,7 @@ func TestLocalizationsMissingRegexpLocalization(t *testing.T) {
 		},
 	}
 
-	dataGood := [][][]interface{}{
+	dataGood := [][][]RawCell{
 		{
 			{"key", "lang_en"},
 			{"m", "xy"},

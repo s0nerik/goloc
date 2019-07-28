@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/goloc/re"
-	"github.com/s0nerik/goloc/platforms/registry"
+	"github.com/s0nerik/goloc/registry"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 )
 
 func init() {
-	registry.Register(&flutter{})
+	registry.RegisterPlatform(&flutter{})
 }
 
 type flutter struct{}
@@ -103,9 +103,11 @@ abstract class AppLocalizations {
 %s}
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+  static const supportedLanguages = %s;
+
   @override
   bool isSupported(Locale locale) {
-    return %s.contains(locale.languageCode);
+    return supportedLanguages.contains(locale.languageCode);
   }
 
   @override

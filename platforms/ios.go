@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/s0nerik/goloc/goloc"
-	"github.com/s0nerik/goloc/platforms/registry"
+	"github.com/s0nerik/goloc/registry"
 )
 
 func init() {
-	registry.Register(&ios{})
+	registry.RegisterPlatform(&ios{})
 }
 
 type ios struct{}
