@@ -19,7 +19,7 @@ var availableSources = fmt.Sprintf(`%v, %v`, remoteSources, localSources)
 
 var (
 	// Basic params
-	source       = kingpin.Flag(`source`, fmt.Sprintf(`Data source. Available sources: %v`, availableSources)).Default(`google_sheets`).Required().String()
+	source       = kingpin.Flag(`source`, fmt.Sprintf(`Data source. Available sources: %v`, availableSources)).Default(`google_sheets`).String()
 	platformName = kingpin.Flag(`platform`, `Target platform name.`).Short('p').Required().String()
 	resDir       = kingpin.Flag(`resources`, `Path to the resources folder in the project.`).Short('r').Required().String()
 
