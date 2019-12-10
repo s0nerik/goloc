@@ -84,9 +84,16 @@ func writeBuffers(
 				return
 			}
 			defer file.Close()
-			defer writer.Flush()
 
 			if _, err = writer.WriteString(buf.String()); err != nil {
+				ch <- err
+				return
+			}
+			if err = writer.Flush(); err != nil {
+				ch <- err
+				return
+			}
+			if err = file.Sync(); err != nil {
 				ch <- err
 				return
 			}
