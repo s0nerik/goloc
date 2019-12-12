@@ -47,7 +47,7 @@ var (
 )
 
 func main() {
-	kingpin.Version("0.9.8")
+	kingpin.Version("0.9.9")
 	kingpin.Parse()
 
 	platform := registry.GetPlatform(*platformName)
@@ -93,6 +93,6 @@ func resolveSource() goloc.Source {
 			log.Fatalf(`"--formats-file-path" must be a valid file path`)
 		}
 		return sources.CSV(*locFilePath, *formatsFilePath)
- 	}
+	}
 	return nil
 }
