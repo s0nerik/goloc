@@ -1,6 +1,7 @@
 package goloc
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -54,10 +55,10 @@ func fetchEverythingRaw(source Source) (rawFormats, rawLocalizations [][]string,
 	wg.Wait()
 
 	if formatsError != nil {
-		return nil, nil, fmt.Errorf(`can't load formats (%v)`, formatsError)
+		return nil, nil, fmt.Errorf(`can't load formats (%w)`, formatsError)
 	}
 	if localizationsError != nil {
-		return nil, nil, fmt.Errorf(`can't load localizations (%v)`, formatsError)
+		return nil, nil, fmt.Errorf(`can't load localizations (%w)`, formatsError)
 	}
 
 	return
@@ -76,28 +77,29 @@ func Run(
 	reportMissingLocalizations bool,
 	defFormatName string,
 	emptyLocalizationMatch *regexp.Regexp,
-) {
+) error {
 	rawFormats, rawLocalizations, err := fetchEverythingRaw(source)
 	if err != nil {
-		log.Fatalf(`Can't fetch data. Reason: %v.`, err)
+		return fmt.Errorf(`can't fetch data, reason: %w`, err)
 	}
 
 	formats, err := ParseFormats(rawFormats, platform, source.FormatsDocumentName(), formatNameColumn, defFormatName)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	localizations, fArgs, warn, err := ParseLocalizations(rawLocalizations, platform, formats, source.LocalizationsDocumentName(), keyColumn, stopOnMissing, emptyLocalizationMatch)
 	if err != nil {
-		log.Fatal(err)
-	} else {
-		if reportMissingLocalizations {
-			reportMissingLanguages(warn)
-			return
-		}
-		for _, w := range warn {
-			log.Println(w)
-		}
+		return err
+	}
+
+	if reportMissingLocalizations {
+		reportMissingLanguages(warn)
+		return errors.New("found missing localizations")
+	}
+
+	for _, w := range warn {
+		log.Println(w)
 	}
 
 	// Make sure we can access resources dir
@@ -105,31 +107,33 @@ func Run(
 		if os.IsNotExist(err) {
 			err := os.MkdirAll(resDir, 0755)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 		} else {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	if p, ok := platform.(Preprocessor); ok {
 		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	err = WriteLocalizations(platform, resDir, localizations, fArgs, defaultLocalization, defaultLocalizationPath)
 	if err != nil {
-		log.Fatalf(`Can't write localizations. Reason: %v.`, err)
+		return fmt.Errorf(`can't write localizations, reason: %w`, err)
 	}
 
 	if p, ok := platform.(Postprocessor); ok {
 		err := p.Postprocess(PostprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func reportMissingLanguages(warnings []error) {

@@ -1,7 +1,7 @@
 package re
 
 import (
-	"log"
+	"fmt"
 	"regexp"
 	"sync"
 )
@@ -16,7 +16,7 @@ func FormatRegexp() *regexp.Regexp {
 	formatRegexpInitializer.Do(func() {
 		r, err := regexp.Compile(`\{([^\{^\}]*)\}`)
 		if err != nil {
-			log.Fatalf("Can't create a regexp for format string. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
+			panic(fmt.Errorf("Can't create a regexp for format string. Reason: %w. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err))
 		}
 		formatRegexp = r
 	})
@@ -31,7 +31,7 @@ func LangColumnNameRegexp() *regexp.Regexp {
 	langColumnRegexpInitializer.Do(func() {
 		r, err := regexp.Compile("lang_([a-z]{2})")
 		if err != nil {
-			log.Fatalf("Can't create a regexp for lang column name. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
+			panic(fmt.Errorf("Can't create a regexp for lang column name. Reason: %w. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err))
 		}
 		langColumnRegexp = r
 	})
@@ -47,7 +47,7 @@ func SprintfRegexp() *regexp.Regexp {
 	sprintRegexpInitializer.Do(func() {
 		r, err := regexp.Compile(`%(?:(\d+)\$)?([\+\-\#0 ]*)(\d+|\*)?(?:\.(\d+|\*))?([a-z%])`)
 		if err != nil {
-			log.Fatalf("Can't create a regext for 'sprintf' format. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err)
+			panic(fmt.Errorf("Can't create a regext for 'sprintf' format. Reason: %v. Please, submit an issue with the execution logs here: https://github.com/s0nerik/goloc", err))
 		}
 		sprintfRegexp = r
 	})

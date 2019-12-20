@@ -1,7 +1,7 @@
 package goloc
 
 import (
-	"log"
+	"fmt"
 	"reflect"
 	"regexp"
 	"sort"
@@ -201,7 +201,8 @@ func withReplacedFormats(platform Platform, str string, formats Formats, tab str
 	strWithReplacedFormats := re.FormatRegexp().ReplaceAllStringFunc(str, func(formatName string) string {
 		defer func() { index++ }()
 		if len(formatName) < 2 {
-			log.Fatalf(`%v: something went wrong. Please submit an issue with the values in the problematic row.`, Cell{tab, uint(row), uint(column)})
+			err = fmt.Errorf(`%v: something went wrong, please submit an issue with the values in the problematic row`, Cell{tab, uint(row), uint(column)})
+			return ""
 		}
 
 		name := formatName[1 : len(formatName)-1]
