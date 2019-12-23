@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/s0nerik/goloc/goloc"
 	"github.com/s0nerik/goloc/registry"
 	"github.com/s0nerik/goloc/sources"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"log"
 
 	// Register all supported platforms
 	_ "github.com/s0nerik/goloc/platforms"
@@ -60,7 +61,23 @@ func main() {
 		log.Fatalf(`"%v" is not a supported source. Supported sources: %v.`, *source, availableSources)
 	}
 
-	goloc.Run(src, platform, *resDir, *keyColumn, *formatNameColumn, *defLoc, *defLocPath, *stopOnMissing, *missingLocalizationsReport, *defFormatName, *emptyLocalizationMatch)
+	err := goloc.Run(
+		src,
+		platform,
+		*resDir,
+		*keyColumn,
+		*formatNameColumn,
+		*defLoc,
+		*defLocPath,
+		*stopOnMissing,
+		*missingLocalizationsReport,
+		*defFormatName,
+		*emptyLocalizationMatch,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func resolveSource() goloc.Source {
@@ -78,7 +95,13 @@ func resolveSource() goloc.Source {
 		if *formatsTabName == "" {
 			log.Fatalf(`"--formats-tab" parameter cannot be empty`)
 		}
-		return sources.GoogleSheets(*credentials, *sheetID, *formatsTabName, *tabName)
+
+		source, err := sources.GoogleSheets(*credentials, *sheetID, *formatsTabName, *tabName)
+		if err != nil {
+			log.Fatalf("can't create googlesheets source, %v", err.Error())
+		}
+
+		return source
 	case "csv":
 		if locFilePath == nil {
 			log.Fatalf(`"--localizations-file-path" parameter must be specified`)

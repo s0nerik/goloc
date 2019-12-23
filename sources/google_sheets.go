@@ -1,12 +1,13 @@
 package sources
 
 import (
+	"fmt"
+	"io/ioutil"
+
 	"github.com/s0nerik/goloc/goloc"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
-	"io/ioutil"
-	"log"
 )
 
 type googleSheets struct {
@@ -22,34 +23,39 @@ func GoogleSheets(
 	sheetID string,
 	formatsTab string,
 	localizationsTab string,
-) *googleSheets {
+) (*googleSheets, error) {
+	sheetsAPI, err := sheetsAPI(credFilePath)
+	if err != nil {
+		return nil, err
+	}
+
 	return &googleSheets{
 		sheetID:          sheetID,
 		formatsTab:       formatsTab,
 		localizationsTab: localizationsTab,
-		sheetsAPI:        sheetsAPI(credFilePath),
-	}
+		sheetsAPI:        sheetsAPI,
+	}, nil
 }
 
-func sheetsAPI(credFilePath string) *sheets.SpreadsheetsService {
+func sheetsAPI(credFilePath string) (*sheets.SpreadsheetsService, error) {
 	ctx := context.Background()
 
 	sec, err := ioutil.ReadFile(credFilePath)
 	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
+		return nil, fmt.Errorf("unable to read client secret file: %w", err)
 	}
 
 	config, err := google.JWTConfigFromJSON(sec, "https://www.googleapis.com/auth/spreadsheets.readonly")
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		return nil, fmt.Errorf("unable to parse client secret file to config: %w", err)
 	}
 
 	s, err := sheets.New(config.Client(ctx))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Sheets Client %v", err)
+		return nil, fmt.Errorf("unable to retrieve Sheets Client: %w", err)
 	}
 
-	return s.Spreadsheets
+	return s.Spreadsheets, nil
 }
 
 func fetchRawValues(api *sheets.SpreadsheetsService, sheetID string, tab string) ([][]interface{}, error) {
