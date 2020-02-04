@@ -16,6 +16,7 @@
 - [Usage](#usage)
 	- [Android](#android)
 	- [Flutter](#flutter)
+- [macOS Catalina usage notes](#macos-catalina-usage-notes)
 - [License](#license)
 
 ## Features
@@ -179,6 +180,17 @@ esac
 goloc/${EXECUTABLE} -c goloc/client_secret.json -p flutter -s 1MbtglvGyEey3gH8yh4c9QovCIbtl5EcwqWqTZUiNga8 -t localizations -r lib/intl
 ```
 
+## macOS Catalina usage notes
+
+Due to the security improvements in the macOS Catalina, any 3rd party application downloaded from the internet has to be notarized to be launched without additional actions from the user side. Since **goloc** is entirely free, I can't afford Apple Developer Program subscription for notarizing macOS builds. Luckily, Apple has left a way to launch a non-notarized app, but it requires some actions.
+
+Here's the instruction on how to launch **goloc** on macOS Catalina:
+
+1. Upon the first launch you'll see a window like this:![catalina_0](docs/images/catalina_0.png?raw=true)
+2. Go to settings and choose `Security & Privacy`:![catalina_1](docs/images/catalina_1.png?raw=true)
+3. Choose `Open Anyway`:![catalina_2](docs/images/catalina_2.png?raw=true)
+4. Re-launch **goloc**, and you'll see a next window:![catalina_3](docs/images/catalina_3.png?raw=true)
+5. Choose `Open`. Next time you launch **goloc**, macOS won't complain anymore.
 
 ## License
 
