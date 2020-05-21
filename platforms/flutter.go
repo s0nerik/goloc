@@ -33,6 +33,8 @@ func (flutter) Header(args *goloc.HeaderArgs) string {
 // messages from the main program should be duplicated here with the same
 // function name.
 
+// ignore_for_file: annotate_overrides, prefer_single_quotes, lines_longer_than_80_chars, non_constant_identifier_names
+
 part of 'localizations.dart';
 
 class AppLocalizations%s implements AppLocalizations {
@@ -87,6 +89,8 @@ func LocalizationsContent(args goloc.PreprocessArgs) string {
 // This is a library that provides messages for a en locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
+
+// ignore_for_file: annotate_overrides, prefer_single_quotes, lines_longer_than_80_chars, non_constant_identifier_names
 
 import 'dart:async';
 import 'dart:ui';
