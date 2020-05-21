@@ -33,7 +33,7 @@ func (flutter) Header(args *goloc.HeaderArgs) string {
 // messages from the main program should be duplicated here with the same
 // function name.
 
-// ignore_for_file: annotate_overrides, prefer_single_quotes, lines_longer_than_80_chars, non_constant_identifier_names
+// ignore_for_file: annotate_overrides, prefer_single_quotes, lines_longer_than_80_chars, non_constant_identifier_names, avoid_escaping_inner_quotes
 
 part of 'localizations.dart';
 
@@ -90,7 +90,7 @@ func LocalizationsContent(args goloc.PreprocessArgs) string {
 // messages from the main program should be duplicated here with the same
 // function name.
 
-// ignore_for_file: annotate_overrides, prefer_single_quotes, lines_longer_than_80_chars, non_constant_identifier_names
+// ignore_for_file: annotate_overrides, prefer_single_quotes, lines_longer_than_80_chars, non_constant_identifier_names, avoid_escaping_inner_quotes
 
 import 'dart:async';
 import 'dart:ui';
