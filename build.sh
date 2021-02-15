@@ -1,5 +1,5 @@
 rm -rf .tmp
-gox -output=".tmp/{{.OS}}_{{.Arch}}" -os="darwin linux windows" -arch="amd64"
+gox -output=".tmp/{{.OS}}_{{.Arch}}" -os="darwin linux windows" -arch="amd64 arm64"
 
 cd .tmp
 
@@ -13,14 +13,29 @@ if [ -x "\$(command -v goloc)" ]; then
   goloc "\$@"
   exit 0
 else
+  EXECUTABLE=""
   case "\$OSTYPE" in
-    darwin*)  EXECUTABLE="darwin_amd64" ;;
-    linux*)   EXECUTABLE="linux_amd64" ;;
-    msys*)    EXECUTABLE="windows_amd64.exe" ;;
+    darwin*)  EXECUTABLE+="darwin_" ;;
+    linux*)   EXECUTABLE+="linux_" ;;
+    msys*)    EXECUTABLE+="windows_" ;;
     *)
       echo "Platform is not supported: \$OSTYPE"
       exit 1
     ;;
+  esac
+  
+  MACHINE_TYPE=\$(uname -m)
+  case "\$MACHINE_TYPE" in
+    arm64*)    EXECUTABLE+="arm64" ;;
+    x86_64*)   EXECUTABLE+="amd64" ;;
+    *)
+      echo "CPU Architecture is not supported: \$MACHINE_TYPE"
+      exit 1
+    ;;
+  esac
+  
+  case "\$OSTYPE" in
+    msys*) EXECUTABLE+=".exe"";;
   esac
 
   echo "Using goloc from project..."
