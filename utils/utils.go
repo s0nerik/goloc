@@ -10,7 +10,7 @@ func columnName(orig string, i uint) string {
 	const ASCIIFirstLetterIndex = 65
 	if i < LettersNum {
 		asciiIndex := ASCIIFirstLetterIndex + i
-		return orig + string(asciiIndex)
+		return orig + string(rune(asciiIndex))
 	}
 	return columnName(columnName(orig, i/LettersNum-1), i%LettersNum)
 }
