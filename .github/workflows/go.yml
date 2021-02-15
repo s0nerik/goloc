@@ -24,6 +24,7 @@ jobs:
 
     - name: Install gox
       run: |
+        go get github.com/mitchellh/gox
         go install github.com/mitchellh/gox
 
     - name: Build
