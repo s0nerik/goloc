@@ -59,7 +59,7 @@ adding: linux_amd64 (deflated 68%)
 adding: windows_amd64.exe (deflated 68%)
 ```
 
-1. Move to output folder and unzip binary
+### Move to output folder and unzip binary
 
 ```bash
 $ cd out  
