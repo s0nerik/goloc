@@ -101,7 +101,7 @@ func writeBuffers(
 		}(lang, buf)
 	}
 
-	for _ = range buffers {
+	for range buffers {
 		if err := <-ch; err != nil {
 			return err
 		}
