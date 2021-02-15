@@ -2,7 +2,7 @@
 
 ## macOS
 
-1. Install [Go](https://golang.org/) via [brew](https://brew.sh/)
+### Install [Go](https://golang.org/) via [brew](https://brew.sh/)
 
 ```bash
 $ brew install go  
@@ -10,7 +10,7 @@ $ go version
 go version go1.10.2 darwin/amd64
 ```
 
-1. Install Go cross compilation tool - [gox](https://github.com/mitchellh/gox) via [brew](https://brew.sh/)
+### Install Go cross compilation tool - [gox](https://github.com/mitchellh/gox) via [brew](https://brew.sh/)
 
 ```bash
 $ brew install gox  
@@ -18,14 +18,14 @@ $ brew info gox
 gox: stable 0.4.0 (bottled)
 ```
 
-1. Check [GOPATH](https://golang.org/cmd/go/#hdr-GOPATH_environment_variable)
+### Check [GOPATH](https://golang.org/cmd/go/#hdr-GOPATH_environment_variable)
 
 ```bash
 $ printenv GOPATH  
 /Users/<user>/go
 ```
 
-1. If [GOPATH](https://golang.org/cmd/go/#hdr-GOPATH_environment_variable) not defined, add it to bash profile
+### If [GOPATH](https://golang.org/cmd/go/#hdr-GOPATH_environment_variable) not defined, add it to bash profile
 
 ```bash
 $ echo 'export GOPATH="$HOME/go"' >> ~/.bash_profile  
@@ -34,19 +34,19 @@ $ printenv GOPATH
 /Users/<user>/go
 ```
 
-1. Get goloc package
+### Get goloc package
 
 ```bash
 go get github.com/s0nerik/goloc
 ```
 
-1. Move to package folder
+### Move to package folder
 
 ```bash
 cd <GOPATH>/src/github.com/s0nerik/goloc
 ```
 
-1. Run build script and wait
+### Run build script and wait
 
 ```bash
 $ sh build.sh  
