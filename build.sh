@@ -1,5 +1,5 @@
 rm -rf .tmp
-gox -output=".tmp/{{.OS}}_{{.Arch}}" -os="darwin linux windows" -arch="amd64 arm64"
+gox -ldflags "-X main.version=$(git describe)" -output=".tmp/{{.OS}}_{{.Arch}}" -os="darwin linux windows" -arch="amd64 arm64"
 
 cd .tmp
 

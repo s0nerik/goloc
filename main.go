@@ -16,6 +16,9 @@ import (
 const remoteSources = `google_sheets`
 const localSources = `csv`
 
+// Must be set using '-ldflags "-X main.version=<version>"'
+var version string
+
 var availableSources = fmt.Sprintf(`%v, %v`, remoteSources, localSources)
 
 var (
@@ -48,7 +51,7 @@ var (
 )
 
 func main() {
-	kingpin.Version("0.9.10")
+	kingpin.Version(version)
 	kingpin.Parse()
 
 	platform := registry.GetPlatform(*platformName)
