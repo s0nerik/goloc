@@ -24,12 +24,12 @@ jobs:
           go get github.com/mitchellh/gox
           go install github.com/mitchellh/gox
 
+      - name: Test
+        run: go test -v ./...
+
       - name: Build
         run: |
           ./build.sh
-
-      - name: Test
-        run: go test -v ./...
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
