@@ -9,10 +9,10 @@ import (
 
 func formats() Formats {
 	data := [][]RawCell{
-		{"format", "mock"},
-		{"x", "s"},
-		{"y", "%s"},
-		{"z", "%s"},
+		{"format",				"mock"},
+		{"x",					"s"},
+		{"y",					"%s"},
+		{"z",					"%s"},
 	}
 
 	platform := newMockPlatform(nil)
@@ -67,43 +67,43 @@ func TestLocalizationsNoLangColumns(t *testing.T) {
 func TestLocalizationsMissingKey(t *testing.T) {
 	dataBad := [][][]RawCell{
 		{
-			{"key", "lang_en"},
-			{"", "something"},
+			{"key",				"lang_en"},
+			{"",				"something"},
 		},
 		{
-			{"key", "lang_en"},
-			{" ", "something"},
+			{"key",				"lang_en"},
+			{" ",				"something"},
 		},
 		{
-			{"lang_en", "key"},
-			{"something"},
+			{"lang_en",			"key"},
+			{"something"				},
 		},
 		{
-			{"lang_en", "key"},
-			{"something", ""},
+			{"lang_en",			"key"},
+			{"something", 		""},
 		},
 		{
-			{"lang_en", "key"},
-			{"something", " "},
+			{"lang_en",			"key"},
+			{"something",		" "},
 		},
 	}
 
 	dataGood := [][][]RawCell{
 		{
-			{"key", "lang_en"},
-			{"k", "something"},
+			{"key",				"lang_en"},
+			{"k",				"something"},
 		},
 		{
-			{"key", "lang_en"},
-			{"k", "something {x}"},
+			{"key",				"lang_en"},
+			{"k",				"something {x}"},
 		},
 		{
-			{"lang_en", "key"},
-			{"something", "k"},
+			{"lang_en",			"key"},
+			{"something",		"k"},
 		},
 		{
-			{"lang_en", "key"},
-			{"something {x}", "k"},
+			{"lang_en",			"key"},
+			{"something {x}",	"k"},
 		},
 	}
 
@@ -128,20 +128,20 @@ func TestLocalizationsMissingKey(t *testing.T) {
 func TestLocalizationsMissingFormat(t *testing.T) {
 	dataBad := [][][]RawCell{
 		{
-			{"key", "lang_en"},
-			{"p1", "something {x}"},
-			{"p2", "something {y}"},
-			{"m", "something {missing}"},
-			{"p3", "something {z}"},
+			{"key",				"lang_en"},
+			{"p1",				"something {x}"},
+			{"p2",				"something {y}"},
+			{"m",				"something {missing}"},
+			{"p3",				"something {z}"},
 		},
 	}
 
 	dataGood := [][][]RawCell{
 		{
-			{"key", "lang_en"},
-			{"p1", "something {x}"},
-			{"p2", "something {y}"},
-			{"p3", "something {z}"},
+			{"key",				"lang_en"},
+			{"p1",				"something {x}"},
+			{"p2",				"something {y}"},
+			{"p3",				"something {z}"},
 		},
 	}
 
@@ -161,31 +161,31 @@ func TestLocalizationsMissingFormat(t *testing.T) {
 func TestLocalizationsMissingLocalization(t *testing.T) {
 	dataBad := [][][]RawCell{
 		{
-			{"key", "lang_en", "lang_ru"},
-			{"m", "something {y}"},
+			{"key",			"lang_en",			"lang_ru"},
+			{"m",			"something {y}"					},
 		},
 		{
-			{"key", "lang_en", "lang_ru"},
-			{"m", "something {y}", ""},
+			{"key",			"lang_en",			"lang_ru"},
+			{"m",			"something {y}",	""},
 		},
 		{
-			{"key", "lang_en", "lang_ru"},
-			{"m", "something {y}", " "},
+			{"key",			"lang_en",			"lang_ru"},
+			{"m",			"something {y}",	" "},
 		},
 		{
-			{"key", "lang_en", "lang_ru"},
-			{"m", "", "что-то {y}"},
+			{"key",			"lang_en",			"lang_ru"},
+			{"m",			"",					"что-то {y}"},
 		},
 		{
-			{"key", "lang_en", "lang_ru"},
-			{"m", " ", "что-то {y}"},
+			{"key",			"lang_en",			"lang_ru"},
+			{"m",			" ",				"что-то {y}"},
 		},
 	}
 
 	dataGood := [][][]RawCell{
 		{
-			{"key", "lang_en", "lang_ru"},
-			{"p", "something {x}", "что-то {x}"},
+			{"key",			"lang_en",			"lang_ru"},
+			{"p",			"something {x}",	"что-то {x}"},
 		},
 	}
 
@@ -212,23 +212,23 @@ func TestLocalizationsMissingRegexpLocalization(t *testing.T) {
 
 	dataBad := [][][]RawCell{
 		{
-			{"key", "lang_en"},
-			{"m", "x"},
+			{"key",			"lang_en"},
+			{"m",			"x"},
 		},
 		{
-			{"key", "lang_en"},
-			{"m", "  x  "},
+			{"key",			"lang_en"},
+			{"m",			"  x  "},
 		},
 	}
 
 	dataGood := [][][]RawCell{
 		{
-			{"key", "lang_en"},
-			{"m", "xy"},
+			{"key",			"lang_en"},
+			{"m",			"xy"},
 		},
 		{
-			{"key", "lang_en"},
-			{"m", " xyz   "},
+			{"key",			"lang_en"},
+			{"m",			" xyz   "},
 		},
 	}
 
