@@ -10,7 +10,7 @@ import (
 	"github.com/s0nerik/goloc/goloc/re"
 )
 
-type langColumns = map[int]Lang
+type langColumns = map[int]Locale
 
 var DefaultEmptyLocRegexp, _ = regexp.Compile("^$")
 
@@ -93,7 +93,10 @@ func localizationColumnIndices(
 		}
 		lang := re.LangColumnNameRegexp().FindStringSubmatch(val)
 		if lang != nil {
-			langCols[i] = lang[1]
+			langCols[i], err = ParseLocale(lang[1])
+			if err != nil {
+				return
+			}
 		}
 	}
 
@@ -164,8 +167,8 @@ func keyLocalizations(
 	langColumns langColumns,
 	errorIfMissing bool,
 	emptyLocalizationRegexp *regexp.Regexp,
-) (keyLoc map[Lang]string, warnings []error, error error) {
-	keyLoc = map[Lang]string{}
+) (keyLoc map[Locale]string, warnings []error, error error) {
+	keyLoc = map[Locale]string{}
 	for i, lang := range langColumns {
 		keyLoc[lang] = ""
 		if i < len(row) {
@@ -234,8 +237,8 @@ func withReplacedSpecialChars(platform Platform, str string) string {
 	return strings.NewReplacer(replacements...).Replace(str)
 }
 
-func (loc Localizations) Count() map[Lang]int {
-	result := map[Lang]int{}
+func (loc Localizations) Count() map[Locale]int {
+	result := map[Locale]int{}
 	for _, keyLoc := range loc {
 		for lang := range keyLoc {
 			result[lang]++
@@ -244,8 +247,8 @@ func (loc Localizations) Count() map[Lang]int {
 	return result
 }
 
-func (loc Localizations) Locales() (locales []string) {
-	langs := map[Lang]bool{}
+func (loc Localizations) Locales() (locales []Locale) {
+	langs := map[Locale]bool{}
 	for _, v := range loc {
 		for lang := range v {
 			langs[lang] = true

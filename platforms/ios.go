@@ -23,7 +23,7 @@ func (ios) Names() []string {
 	}
 }
 
-func (ios) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
+func (ios) LocalizationFilePath(lang goloc.Locale, resDir goloc.ResDir) string {
 	fileName := "Localizable.strings"
 	targetDir := fmt.Sprintf("%v.lproj", lang)
 	if resDir != "" {
@@ -56,7 +56,7 @@ func (ios) FormatString(args *goloc.FormatStringArgs) string {
 }
 
 func (ios) ReplacementChars() map[string]string {
-	return map[string]string {
+	return map[string]string{
 		`'`:  `\'`,
 		`"`:  `\"`,
 		"\n": `\n`,

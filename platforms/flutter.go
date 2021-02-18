@@ -23,7 +23,7 @@ func (flutter) Names() []string {
 	}
 }
 
-func (flutter) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
+func (flutter) LocalizationFilePath(lang goloc.Locale, resDir goloc.ResDir) string {
 	return filepath.Join(resDir, fmt.Sprintf("localizations_%s.g.dart", lang))
 }
 

@@ -13,7 +13,7 @@ func (p *mockPlatform) Names() []string {
 	return args.Get(0).([]string)
 }
 
-func (p *mockPlatform) LocalizationFilePath(lang Lang, resDir ResDir) string {
+func (p *mockPlatform) LocalizationFilePath(lang Locale, resDir ResDir) string {
 	args := p.Called(lang, resDir)
 	return args.String(0)
 }

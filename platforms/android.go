@@ -22,7 +22,7 @@ func (android) Names() []string {
 	}
 }
 
-func (android) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
+func (android) LocalizationFilePath(lang goloc.Locale, resDir goloc.ResDir) string {
 	fileName := "localized_strings.xml"
 	targetDir := fmt.Sprintf("values-%v", lang)
 	if resDir != "" {

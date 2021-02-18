@@ -16,14 +16,11 @@ import (
 
 type RawCell = string
 
-// Lang represents a language code.
-type Lang = string
-
 // Key represents a localized string key.
 type Key = string
 
-// Localizations represents a mapping between a localized string key and it's values for different languages.
-type Localizations map[Key]map[Lang]string
+// Localizations represents a mapping between a localized string key and it's values for different locales.
+type Localizations map[Key]map[Locale]string
 
 // LocalizationFormatArgs represents a mapping between a localized string key and its format arguments.
 type LocalizationFormatArgs map[Key][]FormatKey
@@ -114,20 +111,25 @@ func Run(
 		}
 	}
 
+	defaultLocale, err := ParseLocale(defaultLocalization)
+	if err != nil {
+		return err
+	}
+
 	if p, ok := platform.(Preprocessor); ok {
-		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
+		err := p.Preprocess(PreprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocale})
 		if err != nil {
 			return err
 		}
 	}
 
-	err = WriteLocalizations(platform, resDir, localizations, fArgs, defaultLocalization, defaultLocalizationPath)
+	err = WriteLocalizations(platform, resDir, localizations, fArgs, defaultLocale, defaultLocalizationPath)
 	if err != nil {
 		return fmt.Errorf(`can't write localizations, reason: %w`, err)
 	}
 
 	if p, ok := platform.(Postprocessor); ok {
-		err := p.Postprocess(PostprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocalization})
+		err := p.Postprocess(PostprocessArgs{ResDir: resDir, Localizations: localizations, Formats: formats, FormatArgs: fArgs, DefaultLocalization: defaultLocale})
 		if err != nil {
 			return err
 		}
@@ -166,7 +168,7 @@ func reportMissingLanguages(warnings []error) {
 
 		var missingLanguages []string
 		for _, w := range kv.warnings {
-			missingLanguages = append(missingLanguages, w.lang)
+			missingLanguages = append(missingLanguages, w.lang.String())
 		}
 
 		table.Append([]string{strconv.Itoa(int(row)), key, strings.Join(missingLanguages, ",")})

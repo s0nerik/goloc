@@ -39,7 +39,7 @@ type formatValueInvalidError struct {
 type formatArgsDifferentError struct {
 	cell Cell
 	key  Key
-	lang string
+	lang Locale
 }
 
 type wrongValueTypeError struct {
@@ -62,7 +62,7 @@ type langColumnsNotFoundError struct {
 type localizationMissingError struct {
 	cell Cell
 	key  Key
-	lang string
+	lang Locale
 }
 
 type keyMissingError struct {
@@ -74,7 +74,7 @@ type formatNotFoundError struct {
 	formatName string
 }
 
-func newFormatArgsDifferentError(tab string, row int, col int, key Key, lang string) *formatArgsDifferentError {
+func newFormatArgsDifferentError(tab string, row int, col int, key Key, lang Locale) *formatArgsDifferentError {
 	return &formatArgsDifferentError{
 		cell: *NewCell(tab, uint(row), uint(col)),
 		key:  key,
@@ -82,7 +82,7 @@ func newFormatArgsDifferentError(tab string, row int, col int, key Key, lang str
 	}
 }
 
-func newLocalizationMissingError(tab string, row int, col int, key Key, lang string) *localizationMissingError {
+func newLocalizationMissingError(tab string, row int, col int, key Key, lang Locale) *localizationMissingError {
 	return &localizationMissingError{
 		cell: *NewCell(tab, uint(row), uint(col)),
 		key:  key,

@@ -6,7 +6,7 @@ import "time"
 type LocalizedStringArgs struct {
 	Index      int
 	IsLast     bool
-	Lang       Lang
+	Lang       Locale
 	Key        Key
 	Value      string
 	FormatArgs []string
@@ -20,13 +20,13 @@ type FormatStringArgs struct {
 
 // HeaderArgs encapsulates arguments to a function that returns a localization file header for a given platform.
 type HeaderArgs struct {
-	Lang Lang
+	Lang Locale
 	Time time.Time
 }
 
 // FooterArgs encapsulates arguments to a function that returns a localization file footer for a given platform.
 type FooterArgs struct {
-	Lang Lang
+	Lang Locale
 }
 
 // Platform represents an object responsible for specifying a format of the resulting localization file.
@@ -35,7 +35,7 @@ type Platform interface {
 	Names() []string
 
 	// Returns a full relative path to localization file for a given language.
-	LocalizationFilePath(lang Lang, resDir ResDir) string
+	LocalizationFilePath(lang Locale, resDir ResDir) string
 
 	// Returns header text. Returned string can be empty. Newlines must be included here if localization format requires them.
 	Header(args *HeaderArgs) string

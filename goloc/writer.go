@@ -13,8 +13,8 @@ import (
 func newWriter(
 	platform Platform,
 	dir ResDir,
-	lang Lang,
-	defLocLang Lang,
+	lang Locale,
+	defLocLang Locale,
 	defLocPath string,
 ) (file *os.File, writer *bufio.Writer, error error) {
 	// Get actual resource file dir and name
@@ -44,7 +44,7 @@ func newWriter(
 	return
 }
 
-func writeHeaders(platform Platform, buffers map[Lang]*bytes.Buffer, t time.Time) error {
+func writeHeaders(platform Platform, buffers map[Locale]*bytes.Buffer, t time.Time) error {
 	headerArgs := &HeaderArgs{}
 	for lang, buf := range buffers {
 		headerArgs.Lang = lang
@@ -56,7 +56,7 @@ func writeHeaders(platform Platform, buffers map[Lang]*bytes.Buffer, t time.Time
 	return nil
 }
 
-func writeFooters(platform Platform, buffers map[Lang]*bytes.Buffer) error {
+func writeFooters(platform Platform, buffers map[Locale]*bytes.Buffer) error {
 	footerArgs := &FooterArgs{}
 	for lang, buf := range buffers {
 		footerArgs.Lang = lang
@@ -71,13 +71,13 @@ func writeBuffers(
 	platform Platform,
 	dir ResDir,
 	localizations Localizations,
-	defLocLang Lang,
+	defLocLang Locale,
 	defLocPath string,
-	buffers map[Lang]*bytes.Buffer,
+	buffers map[Locale]*bytes.Buffer,
 ) error {
 	ch := make(chan error, len(buffers))
 	for lang, buf := range buffers {
-		go func(lang Lang, buf *bytes.Buffer) {
+		go func(lang Locale, buf *bytes.Buffer) {
 			file, writer, err := newWriter(platform, dir, lang, defLocLang, defLocPath)
 			if err != nil {
 				ch <- err
@@ -116,15 +116,15 @@ func WriteLocalizations(
 	dir ResDir,
 	localizations Localizations,
 	formatArgs LocalizationFormatArgs,
-	defLocLang Lang,
+	defLocLang Locale,
 	defLocPath string,
 ) (error error) {
-	locIndices := map[Lang]int{}
+	locIndices := map[Locale]int{}
 	locCounts := localizations.Count()
 	locStringArgs := &LocalizedStringArgs{}
 
 	// Prepare string buffers for each language
-	buffers := map[Lang]*bytes.Buffer{}
+	buffers := map[Locale]*bytes.Buffer{}
 	for lang := range locCounts {
 		buffers[lang] = bytes.NewBufferString("")
 	}
@@ -177,9 +177,9 @@ func WriteLocalizations(
 	return nil
 }
 
-func localizationFilePath(platform Platform, dir ResDir, lang Lang, defLocLang Lang, defLocPath string) (resDir string, fileName string, err error) {
+func localizationFilePath(platform Platform, dir ResDir, lang Locale, defLocLang Locale, defLocPath string) (resDir string, fileName string, err error) {
 	// Handle default language
-	if len(defLocLang) > 0 && lang == defLocLang && len(defLocPath) > 0 {
+	if len(defLocLang.String()) > 0 && lang == defLocLang && len(defLocPath) > 0 {
 		resDir = path.Dir(defLocPath)
 		fileName = path.Base(defLocPath)
 	} else {

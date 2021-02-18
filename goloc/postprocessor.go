@@ -6,7 +6,7 @@ type PostprocessArgs struct {
 	Formats             Formats
 	FormatArgs          LocalizationFormatArgs
 	ResDir              ResDir
-	DefaultLocalization Lang
+	DefaultLocalization Locale
 }
 
 type Postprocessor interface {

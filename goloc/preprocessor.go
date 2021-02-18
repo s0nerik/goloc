@@ -6,7 +6,7 @@ type PreprocessArgs struct {
 	Formats             Formats
 	FormatArgs          LocalizationFormatArgs
 	ResDir              ResDir
-	DefaultLocalization Lang
+	DefaultLocalization Locale
 }
 
 type Preprocessor interface {

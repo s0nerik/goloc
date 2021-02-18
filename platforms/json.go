@@ -21,7 +21,7 @@ func (json) Names() []string {
 	}
 }
 
-func (json) LocalizationFilePath(lang goloc.Lang, resDir goloc.ResDir) string {
+func (json) LocalizationFilePath(lang goloc.Locale, resDir goloc.ResDir) string {
 	return filepath.Join(resDir, fmt.Sprintf("%v.json", lang))
 }
 
