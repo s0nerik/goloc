@@ -35,7 +35,7 @@ else
   esac
   
   case "\$OSTYPE" in
-    msys*) EXECUTABLE+=".exe"";;
+    msys*) EXECUTABLE+=".exe";;
   esac
 
   echo "Using goloc from project..."
