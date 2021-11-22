@@ -38,7 +38,7 @@ func (flutter) Header(args *goloc.HeaderArgs) string {
 part of 'localizations.dart';
 
 class AppLocalizations%s implements AppLocalizations {
-  final AppLocalizations fallback;
+  final AppLocalizations? fallback;
 
   AppLocalizations%s(this.fallback);
 
@@ -48,18 +48,18 @@ class AppLocalizations%s implements AppLocalizations {
 func (flutter) LocalizedString(args *goloc.LocalizedStringArgs) string {
 	if len(args.FormatArgs) > 0 {
 		fArgs := buildFormatArgsList(args.FormatArgs, nil)
-		return fmt.Sprintf("  String %s(%s) => sprintf(\"%s\", [%s]);\n", args.Key, fArgs, args.Value, fArgs)
+		return fmt.Sprintf("  String? %s(%s) => sprintf(\"%s\", [%s]);\n", args.Key, fArgs, args.Value, fArgs)
 	} else {
-		return fmt.Sprintf("  String get %s => \"%s\";\n", args.Key, args.Value)
+		return fmt.Sprintf("  String? get %s => \"%s\";\n", args.Key, args.Value)
 	}
 }
 
 func (flutter) FallbackString(args *goloc.LocalizedStringArgs) string {
 	if len(args.FormatArgs) > 0 {
 		fArgs := buildFormatArgsList(args.FormatArgs, nil)
-		return fmt.Sprintf("  String %s(%s) => fallback?.%s(%s);\n", args.Key, fArgs, args.Key, fArgs)
+		return fmt.Sprintf("  String? %s(%s) => fallback?.%s(%s);\n", args.Key, fArgs, args.Key, fArgs)
 	} else {
-		return fmt.Sprintf("  String get %s => fallback?.%s;\n", args.Key, args.Key)
+		return fmt.Sprintf("  String? get %s => fallback?.%s;\n", args.Key, args.Key)
 	}
 }
 
@@ -101,7 +101,7 @@ import 'package:sprintf/sprintf.dart';
 %s
 abstract class AppLocalizations {
   static AppLocalizations of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
 %s}
@@ -138,11 +138,11 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 	for _, key := range args.Localizations.SortedKeys() {
 		fArgs := args.FormatArgs[key]
 		if len(fArgs) <= 0 {
-			str := fmt.Sprintf("  String get %s;\n", key)
+			str := fmt.Sprintf("  String? get %s;\n", key)
 			locBuilder.WriteString(str)
 		} else {
 			typedArgsStr := buildFormatArgsList(fArgs, args.Formats)
-			str := fmt.Sprintf("  String %s(%s);\n", key, typedArgsStr)
+			str := fmt.Sprintf("  String? %s(%s);\n", key, typedArgsStr)
 			locBuilder.WriteString(str)
 		}
 	}
