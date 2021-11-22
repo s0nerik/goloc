@@ -101,7 +101,7 @@ import 'package:sprintf/sprintf.dart';
 %s
 abstract class AppLocalizations {
   static AppLocalizations of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
 %s}
